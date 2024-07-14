@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+
+<generatorConfiguration>
+
+    <context id="context" targetRuntime="MyBatis3">
+
+        <commentGenerator>
+            <property name="suppressAllComments" value="true"/>
+            <property name="suppressDate" value="true"/>
+        </commentGenerator>
+
+        <!--         数据库的相关配置 -->
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://192.168.6.18:3306/bos_op" userId="root"
+                        password="123456"/>
+
+<!--        <jdbcConnection driverClass="org.postgresql.Driver"-->
+<!--                        connectionURL="jdbc:postgresql://192.168.6.18:5432/ns_uc" userId="uc_user"-->
+<!--                        password="uc_user"/>-->
+
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="true"/>
+            <property name="useJSR310Types" value="true"/>
+        </javaTypeResolver>
+
+
+        <!-- 实体类生成的位置 -->
+        <javaModelGenerator targetPackage="com.luoge.bos.op.invoice.entity" targetProject="op-invoice/src/main/java">
+            <property name="enableSubPackages" value="false"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!-- Mapper.xml 文件的位置 -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="op-invoice/src/main/resources/META-INF">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <!-- Mapper 接口文件的位置 -->
+        <javaClientGenerator targetPackage="com.luoge.bos.op.dao" targetProject="op-invoice/src/main/java"
+                             type="XMLMAPPER">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <!-- 相关表的配置 -->
+        <table tableName="inv_sync_record"
+               mapperName="InvSyncRecordDao"
+               domainObjectName="InvSyncRecordDO"
+
+               enableSelectByPrimaryKey="true"
+               enableCountByExample="false"
+               enableSelectByExample="false"
+               enableUpdateByPrimaryKey="false"
+               enableUpdateByExample="false"
+               enableDeleteByPrimaryKey="false"
+               enableDeleteByExample="false">
+
+            <columnOverride column="type" property="type" javaType="java.lang.Integer"/>
+            <columnOverride column="status" property="status" javaType="java.lang.Integer"/>
+        </table>
+
+    </context>
+
+
+</generatorConfiguration>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luoge.bos.op.invoice.collect.schedule.NsInvoiceOutDao">
+
+    <sql id="cols">
+        <trim>
+            id, org_id, enterprise_id, period, invoice_code,
+            invoice_no, invoice_type, issue_time, category,
+            tax_type, method, buyer_personal_flag, buyer_name,
+            buyer_tax_no, buyer_address, buyer_phone, buyer_bank_name,
+            buyer_bank_account, seller_name, seller_tax_no, seller_address,
+            seller_phone, seller_bank_name, seller_bank_account, total_amount,
+            total_tax, total, remark, tax_bureau,
+            receiver, issuer, reviewer, notify_email,
+            ext, status, red_apply_code,
+            red_confirm_code, red_relate_no,
+            pdf_file_id, ofd_file_id, xml_file_id,
+            include_tax_flag, fail_reason, offset_amount,
+            business_id, preview_img_id,
+            create_time, update_time
+        </trim>
+    </sql>
+
+    <insert id="insert">
+        insert into inv_invoice_out
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            id,
+            org_id,
+            enterprise_id,
+            period,
+            invoice_type,
+            issue_time,
+            category,
+            tax_type,
+            method,
+            buyer_personal_flag,
+            buyer_name,
+            buyer_tax_no,
+            buyer_address,
+            buyer_phone,
+            buyer_bank_name,
+            buyer_bank_account,
+            seller_name,
+            seller_tax_no,
+            seller_address,
+            seller_phone,
+            seller_bank_name,
+            seller_bank_account,
+            total_amount,
+            total_tax,
+            total,
+            remark,
+            receiver,
+            issuer,
+            reviewer,
+            notify_email,
+            ext,
+            status,
+            offset_amount,
+            include_tax_flag,
+            business_id,
+            preview_img_id,
+            mobile_user_id,
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{id},
+            #{orgId,jdbcType=INTEGER},
+            #{enterpriseId,jdbcType=INTEGER},
+            #{period,jdbcType=VARCHAR},
+            #{invoiceType,jdbcType=SMALLINT},
+            #{issueTime,jdbcType=DATE},
+            #{category,jdbcType=SMALLINT},
+            #{taxType,jdbcType=SMALLINT},
+            #{method,jdbcType=SMALLINT},
+            #{buyerPersonalFlag,jdbcType=BIT},
+            #{buyerName,jdbcType=VARCHAR},
+            #{buyerTaxNo,jdbcType=VARCHAR},
+            #{buyerAddress,jdbcType=VARCHAR},
+            #{buyerPhone,jdbcType=VARCHAR},
+            #{buyerBankName,jdbcType=VARCHAR},
+            #{buyerBankAccount,jdbcType=VARCHAR},
+            #{sellerName,jdbcType=VARCHAR},
+            #{sellerTaxNo,jdbcType=VARCHAR},
+            #{sellerAddress,jdbcType=VARCHAR},
+            #{sellerPhone,jdbcType=VARCHAR},
+            #{sellerBankName,jdbcType=VARCHAR},
+            #{sellerBankAccount,jdbcType=VARCHAR},
+            #{totalAmount,jdbcType=NUMERIC},
+            #{totalTax,jdbcType=NUMERIC},
+            #{total,jdbcType=NUMERIC},
+            #{remark,jdbcType=VARCHAR},
+            #{receiver,jdbcType=VARCHAR},
+            #{issuer,jdbcType=VARCHAR},
+            #{reviewer,jdbcType=VARCHAR},
+            #{notifyEmail,jdbcType=VARCHAR},
+            #{ext},
+            #{status,jdbcType=SMALLINT},
+            #{offsetAmount},
+            #{includeTaxFlag,jdbcType=BOOLEAN},
+            #{businessId,jdbcType=VARCHAR},
+            #{previewImgId},
+            #{mobileUserId},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{updateTime,jdbcType=TIMESTAMP}
+        </trim>
+    </insert>
+
+
+    <select id="countInvoice" resultType="java.lang.Integer">
+        select count(*)
+        from inv_invoice_out
+        where org_id = #{orgId}
+          and enterprise_id = #{enterpriseId}
+          and update_time >= #{startTime}
+          and #{endTime} > update_time
+          and status in (3, 5, 6)
+    </select>
+
+    <select id="listByPage" resultType="com.luoge.bos.op.invoice.entity.InvoiceOutDO">
+        select
+        <include refid="cols"/>
+        from inv_invoice_out
+        where org_id = #{orgId}
+        and enterprise_id = #{enterpriseId}
+        and update_time >= #{startTime}
+        and #{endTime} > update_time
+        and status in (3,5,6)
+        limit #{offset}, #{limit}
+    </select>
+
+</mapper>

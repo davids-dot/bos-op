@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.luoge.bos.op.invoice.park.provider.ParkProviderDao">
+    <sql id="cols">
+        <trim>
+            id, name, remark, status,
+            account_name, account_open_bank, account_bank, account_no,
+            service_fee_rate, additional_tax_rate, water_tax_rate, stamp_tax_rate,
+            income_tax_rate, income_tax_type, create_time, update_time,
+            registration_fee,park_provider_registration_fee,is_mini_app_show,
+            value_added_tax_type,is_include_tax,include_tax_rate,value_added_tax_formula_id,
+            additional_tax_formula_id,water_tax_formula_id,stamp_tax_formula_id,income_tax_formula_id,
+            value_added_tax_rate
+        </trim>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        insert into inv_park_provider(name, remark, status, account_name, account_open_bank, account_bank,
+                                      account_no, service_fee_rate, additional_tax_rate, water_tax_rate, stamp_tax_rate,
+                                      income_tax_rate, income_tax_type, create_time, update_time,registration_fee,park_provider_registration_fee,is_mini_app_show,
+                                      value_added_tax_formula_id,additional_tax_formula_id,water_tax_formula_id,stamp_tax_formula_id,
+                                      income_tax_formula_id,value_added_tax_rate,value_added_tax_type,is_include_tax,include_tax_rate)
+        VALUES (#{name}, #{remark}, #{status}, #{accountName}, #{accountOpenBank}, #{accountBank}, #{accountNo},
+                #{serviceFeeRate}, #{additionalTaxRate}, #{waterTaxRate}, #{stampTaxRate}, #{incomeTaxRate},
+                #{incomeTaxType}, #{createTime}, #{updateTime},#{registrationFee},#{parkProviderRegistrationFee},#{isMiniAppShow},
+                #{valueAddedTaxFormulaId},#{additionalTaxFormulaId},#{waterTaxFormulaId},#{stampTaxFormulaId},
+                #{incomeTaxFormulaId},#{valueAddedTaxRate},#{valueAddedTaxType},#{isIncludeTax},#{includeTaxRate})
+    </insert>
+
+    <update id="update">
+        update inv_park_provider
+        set name                           = #{name},
+            remark                         = #{remark},
+            account_name                   = #{accountName},
+            account_open_bank              = #{accountOpenBank},
+            account_bank                   = #{accountBank},
+            account_no                     = #{accountNo},
+            service_fee_rate               = #{serviceFeeRate},
+            additional_tax_rate            = #{additionalTaxRate},
+            water_tax_rate                 = #{waterTaxRate},
+            stamp_tax_rate                 = #{stampTaxRate},
+            income_tax_rate                = #{incomeTaxRate},
+            income_tax_type                = #{incomeTaxType},
+            update_time                    = #{updateTime},
+            is_mini_app_show               = #{isMiniAppShow},
+            registration_fee               = #{registrationFee},
+            park_provider_registration_fee = #{parkProviderRegistrationFee},
+            value_added_tax_type           = #{valueAddedTaxType},
+            value_added_tax_formula_id     = #{valueAddedTaxFormulaId},
+            additional_tax_formula_id      = #{additionalTaxFormulaId},
+            water_tax_formula_id           = #{waterTaxFormulaId},
+            stamp_tax_formula_id           = #{stampTaxFormulaId},
+            income_tax_formula_id          = #{incomeTaxFormulaId},
+            value_added_tax_rate           = #{valueAddedTaxRate},
+            is_include_tax                 =#{isIncludeTax},
+            include_tax_rate               =#{includeTaxRate}
+        where id = #{id}
+    </update>
+
+    <select id="list" resultType="com.luoge.bos.op.invoice.entity.ParkProviderDO">
+        select id,name,remark,status,create_time
+        from inv_park_provider
+        <where>
+            <if test="name != null and name != ''">
+                name like concat ('%',#{name},'%')
+            </if>
+        </where>
+        order by status asc ,create_time desc
+    </select>
+
+    <select id="get" resultType="com.luoge.bos.op.invoice.entity.ParkProviderDO">
+        select id,
+               name,
+               remark,
+               status,
+               account_name,
+               account_open_bank,
+               account_bank,
+               account_no,
+               service_fee_rate,
+               additional_tax_rate,
+               water_tax_rate,
+               stamp_tax_rate,
+               income_tax_rate,
+               value_added_tax_rate,
+               income_tax_type,
+               create_time,
+               registration_fee,
+               park_provider_registration_fee,
+               is_mini_app_show,
+               value_added_tax_type,
+               value_added_tax_formula_id,
+               additional_tax_formula_id,
+               water_tax_formula_id,
+               stamp_tax_formula_id,
+               income_tax_formula_id,
+               is_include_tax,
+               include_tax_rate
+        from inv_park_provider
+        where id = #{id}
+    </select>
+
+    <update id="updateStatus">
+        update inv_park_provider
+        set status = #{status}
+        where id = #{id}
+    </update>
+
+    <select id="existName" resultType="boolean">
+        select count(*) > 0
+        from inv_park_provider
+        where name = #{name}
+    </select>
+
+    <select id="getByName" resultType="com.luoge.bos.op.invoice.entity.ParkProviderDO">
+        select
+        <include refid="cols"/>
+        from inv_park_provider
+        where name = #{name}
+    </select>
+
+    <select id="listAll" resultType="com.luoge.bos.op.invoice.entity.ParkProviderDO">
+        select
+        <include refid="cols"/>
+        from inv_park_provider
+    </select>
+
+    <select id="listByStatus" resultType="com.luoge.bos.op.invoice.entity.ParkProviderDO">
+        select
+        <include refid="cols"/>
+        from inv_park_provider
+        <where>
+            <if test="status > 0">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>

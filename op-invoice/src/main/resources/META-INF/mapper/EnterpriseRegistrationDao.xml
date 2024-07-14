@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luoge.bos.op.invoice.org.enterprise.EnterpriseRegistrationDao">
+
+    <sql id="cols">
+        <trim>
+            id, org_id, user_id, status, park_provider_id, industry_id, id_card_front_file_id,
+            id_card_back_file_id, photo_file_id, corporate_name, corporate_id_no, corporate_phone,
+            is_bureau, candidate_enterprise_name, payment_proof_file_id, payment_amount, park_provider_account_name,
+            park_provider_account_bank, park_provider_account_no, park_provider_name, enterprise_name,
+            enterprise_tax_no, enterprise_type, enterprise_license_file_id,real_corporate_name, create_time, update_time
+        </trim>
+    </sql>
+
+    <select id="list" resultType="com.luoge.bos.op.invoice.entity.invoice.EnterpriseRegistrationDO">
+        select
+        <include refid="cols"/>
+        from inv_enterprise_registration
+        <where>
+            status != 1
+            <if test="corporateName != null and corporateName != ''">
+                and corporate_name like concat ('%',#{corporateName},'%')
+            </if>
+            <if test="parkProviderId > 0 ">
+                and park_provider_id = #{parkProviderId}
+            </if>
+            <if test="status > 0 ">
+                and status = #{status}
+            </if>
+            <if test="startTime != null">
+                and create_time >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and #{endTime} > create_time
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="get" resultType="com.luoge.bos.op.invoice.entity.invoice.EnterpriseRegistrationDO">
+        select
+        <include refid="cols"/>
+        from inv_enterprise_registration
+        where id=#{id}
+    </select>
+
+    <update id="update">
+        update inv_enterprise_registration
+        set corporate_name            = #{corporateName},
+            corporate_id_no           = #{corporateIdNo},
+            corporate_phone           = #{corporatePhone},
+            id_card_front_file_id     = #{idCardFrontFileId},
+            id_card_back_file_id      = #{idCardBackFileId},
+            photo_file_id             = #{photoFileId},
+            industry_id               = #{industryId},
+            park_provider_id          = #{parkProviderId},
+            park_provider_name        = #{parkProviderName},
+            is_bureau                 = #{isBureau},
+            update_time               = #{updateTime},
+            candidate_enterprise_name = #{candidateEnterpriseName}
+        where id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        update inv_enterprise_registration
+        set status      = #{status},
+            update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <select id="getById" resultType="com.luoge.bos.op.invoice.entity.invoice.EnterpriseRegistrationDO">
+        select
+        <include refid="cols"/>
+        from inv_enterprise_registration
+        where id = #{id}
+    </select>
+
+    <update id="updateResult">
+        update inv_enterprise_registration
+        set enterprise_name            = #{enterpriseName},
+            enterprise_tax_no          = #{enterpriseTaxNo},
+            enterprise_type            = #{enterpriseType},
+            real_corporate_name        = #{realCorporateName},
+            enterprise_license_file_id = #{enterpriseLicenseFileId},
+            status                     = #{status},
+            update_time                = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <insert id="insert" parameterType="com.luoge.bos.op.invoice.entity.invoice.EnterpriseRegistrationDO">
+        insert into inv_enterprise_registration (id, org_id, user_id,
+                                                 status, park_provider_id, industry_id,
+                                                 id_card_front_file_id, id_card_back_file_id, photo_file_id,
+                                                 corporate_name, corporate_id_no, corporate_phone,
+                                                 is_bureau, candidate_enterprise_name, payment_proof_file_id,
+                                                 payment_amount, park_provider_account_name,
+                                                 park_provider_account_bank, park_provider_account_no,
+                                                 park_provider_name, enterprise_name, enterprise_tax_no,
+                                                 enterprise_type, enterprise_license_file_id,
+                                                 create_time, update_time)
+        values (#{id}, #{orgId}, #{userId},
+                #{status}, #{parkProviderId}, #{industryId},
+                #{idCardFrontFileId}, #{idCardBackFileId}, #{photoFileId},
+                #{corporateName}, #{corporateIdNo}, #{corporatePhone},
+                #{isBureau}, #{candidateEnterpriseName}, #{paymentProofFileId},
+                #{paymentAmount}, #{parkProviderAccountName},
+                #{parkProviderAccountBank}, #{parkProviderAccountNo},
+                #{parkProviderName}, #{enterpriseName}, #{enterpriseTaxNo},
+                #{enterpriseType}, #{enterpriseLicenseFileId},
+                #{createTime}, #{updateTime})
+    </insert>
+
+</mapper>

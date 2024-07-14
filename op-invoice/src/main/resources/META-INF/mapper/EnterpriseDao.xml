@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luoge.bos.op.invoice.org.enterprise.EnterpriseDao">
+    <sql id="cols">
+        <trim>
+            id, org_id, name, type, tax_no, region_code, industry_code, bank, account, address,
+            phone, remark, status, upstream_username, upstream_passwd, create_time, update_time,
+            bureau_identity_type
+        </trim>
+    </sql>
+
+    <select id="listCount" resultType="com.luoge.bos.op.invoice.model.org.EnterpriseCountBO">
+        select org_id,
+        count(*) count
+        from iam_enterprise
+        group by org_id
+    </select>
+
+    <select id="listByPage" resultType="com.luoge.bos.op.invoice.entity.uc.EnterpriseDO">
+        select id,name,type,tax_no,region_code,status,create_time
+        from iam_enterprise
+        <where>
+            <if test="orgId != null">
+                and org_id = #{orgId}
+            </if>
+            <if test="name != null and name != ''">
+                and name like concat ('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="existName" resultType="boolean">
+        select count(*) > 0
+        from iam_enterprise
+        where org_id = #{orgId}
+        and name = #{name}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into iam_enterprise(org_id, name, type, tax_no, region_code, industry_code, bank, account, address,
+        phone, remark, status, upstream_username, upstream_passwd, create_time, update_time, bureau_identity_type)
+        VALUES (#{orgId}, #{name}, #{type}, #{taxNo}, #{regionCode}, #{industryCode}, #{bank}, #{account}, #{address},
+        #{phone},
+        #{remark},
+        #{status}, #{upstreamUsername}, #{upstreamPasswd}, #{createTime}, #{updateTime}, #{bureauIdentityType})
+    </insert>
+
+    <update id="update" parameterType="com.luoge.bos.op.invoice.entity.uc.EnterpriseDO">
+        update iam_enterprise
+        set name = #{name},
+        type = #{type},
+        tax_no = #{taxNo},
+        region_code = #{regionCode},
+        industry_code = #{industryCode},
+        bank = #{bank},
+        account = #{account},
+        address = #{address},
+        phone = #{phone},
+        remark = #{remark},
+        upstream_username = #{upstreamUsername},
+        upstream_passwd = #{upstreamPasswd},
+        update_time = #{updateTime},
+        bureau_identity_type = #{bureauIdentityType}
+        where id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        update iam_enterprise
+        set status = #{status}
+        where id = #{enterpriseId}
+    </update>
+
+    <select id="getByName" resultType="com.luoge.bos.op.invoice.entity.uc.EnterpriseDO">
+        select
+        <include refid="cols"/>
+        from iam_enterprise
+        where org_id = #{orgId}
+        and name = #{name}
+    </select>
+
+    <select id="getDetail" resultType="com.luoge.bos.op.invoice.entity.uc.EnterpriseDO">
+        select
+        <include refid="cols"/>
+        from iam_enterprise
+        where id = #{id}
+    </select>
+
+    <select id="listEnterpriseByIds" resultType="com.luoge.bos.op.invoice.model.org.OrgEnterpriseBO">
+        select
+        e.org_id,
+        o.name org_name,
+        e.id enterprise_id,
+        e.name enterprise_name,
+        e.tax_no
+        from iam_enterprise e
+        left join iam_org o
+        on e.org_id = o.id
+        where e.id in
+        <foreach collection="enterpriseIds" item="enterpriseId" open="(" close=")" separator=",">
+            #{enterpriseId}
+        </foreach>
+    </select>
+
+    <select id="listAll" resultType="com.luoge.bos.op.invoice.entity.uc.EnterpriseDO">
+        select
+        <include refid="cols"/>
+        from iam_enterprise
+    </select>
+
+    <select id="listNotParkEnterprise" resultType="com.luoge.bos.op.invoice.entity.uc.EnterpriseDO">
+        select
+        <include refid="cols"/>
+        from iam_enterprise
+        <where>
+            status = 1
+            <if test="orgId > 0">
+                and org_id = #{orgId}
+            </if>
+            <if test="name != null and name != ''">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="parkEnterpriseIds != null and parkEnterpriseIds.size > 0">
+                and id not in
+                <foreach collection="parkEnterpriseIds" item="parkEnterpriseId"
+                         open="(" close=")" separator=",">
+                    #{parkEnterpriseId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="listIndustries" resultType="com.luoge.bos.op.invoice.entity.uc.IndustryDO">
+        SELECT code, name, remark
+        FROM iam_dm_industry
+    </select>
+
+    <select id="getByTaxNo" resultType="com.luoge.bos.op.invoice.entity.uc.EnterpriseDO">
+        select
+        <include refid="cols"/>
+        from iam_enterprise
+        where org_id = #{orgId}
+        and tax_no = #{taxNo}
+    </select>
+
+    <insert id="insertEnterprise">
+        insert into iam_enterprise(org_id,name,tax_no,status,create_time,update_time)
+        values (#{orgId},#{name},#{taxNo},#{status},#{createTime},#{updateTime})
+    </insert>
+
+    <select id="list" resultType="com.luoge.bos.op.invoice.entity.uc.EnterpriseDO">
+        select
+        <include refid="cols"/>
+        from iam_enterprise
+    </select>
+
+    <insert id="insertEnterpriseUserRelation">
+        insert into iam_enterprise_user(org_id, enterprise_id, user_id, create_time)
+        values (#{orgId}, #{enterpriseId}, #{userId}, #{createTime});
+    </insert>
+
+</mapper>

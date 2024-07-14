@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luoge.bos.op.invoice.apply.InvoiceApplyDao">
+
+    <sql id="cols">
+        <trim>
+            id, org_id, enterprise_id, user_id,
+            invoice_type, buyer_personal_flag, buyer_name,
+            buyer_tax_no, buyer_address, buyer_phone,
+            buyer_bank_name, buyer_bank_account, seller_name,
+            seller_tax_no, seller_address, seller_phone,
+            seller_bank_name, seller_bank_account, total_amount,
+            total_tax, total, remark,
+            notify_email, status, include_tax_flag,
+            business_proof_file_ids, fund_proof_file_ids,
+            service_fee, payment_proof_file_id, create_time,
+            update_time,service_fee_rate
+        </trim>
+    </sql>
+
+
+    <select id="getById" parameterType="java.lang.Long"
+            resultType="com.luoge.bos.op.invoice.entity.invoice.InvoiceApplyDO">
+        select
+        <include refid="cols"/>
+        from inv_invoice_apply
+        <where>
+            id =#{id}
+        </where>
+    </select>
+
+    <select id="list" resultType="com.luoge.bos.op.invoice.model.apply.InvoiceApplyBO">
+        select
+        a.id,
+        a.enterprise_id,
+        a.seller_name            enterprise_name,
+        a.service_fee_rate * 100 service_fee_rate,
+        b.park_provider_id,
+        c.name park_provider_name,
+        a.total,
+        a.service_fee,
+        a.status,
+        a.create_time
+        from inv_invoice_apply a
+        left join inv_park_enterprise b on a.enterprise_id = b.enterprise_id
+        left join inv_park_provider c on b.park_provider_id = c.id
+        <where>
+            a.status != 1
+            <if test="enterpriseName != null and enterpriseName != '' ">
+                and b.enterprise_name like concat('%', #{enterpriseName},'%')
+            </if>
+            <if test="parkProviderId > 0">
+                and b.park_provider_id = #{parkProviderId}
+            </if>
+            <if test="status > 0 ">
+                and a.status = #{status}
+            </if>
+            <if test="startTime != null">
+                and a.create_time >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and #{endTime} > a.create_time
+            </if>
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <update id="updateStatus">
+        update inv_invoice_apply
+        set status      = #{status},
+            update_time = #{updateTime}
+        where id = #{id}
+    </update>
+</mapper>

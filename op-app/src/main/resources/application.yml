@@ -1,0 +1,131 @@
+server:
+  port: 9192
+
+spring:
+  aop:
+    proxy-target-class: true
+  application:
+    name: bos-op
+  profiles:
+    active: ${ENV:dev}
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+  datasource:
+    dynamic:
+      enabled: true #启用动态数据源，默认true
+      primary: master #设置默认的数据源或者数据源组,默认值即为master
+      strict: false #严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
+      grace-destroy: false #是否优雅关闭数据源，默认为false，设置为true时，关闭数据源时如果数据源中还存在活跃连接，至多等待10s后强制关闭
+      datasource:
+        master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${BOS_OP_DB_SERVER}/bos_op?useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true&autoReconnect=true&allowMultiQueries=true
+          username: ${BOS_OP_DB_USERNAME}
+          password: ${BOS_OP_DB_PASSWD}
+        bos-uc:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${BOS_UC_DB_SERVER}/bos_uc?useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true&autoReconnect=true&allowMultiQueries=true
+          username: ${BOS_UC_DB_USERNAME}
+          password: ${BOS_UC_DB_PASSWD}
+        invoice:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${NS_INVOICE_DB_SERVER}/ns_invoice?useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true&autoReconnect=true&allowMultiQueries=true
+          username: ${NS_INVOICE_DB_USERNAME}
+          password: ${NS_INVOICE_DB_PASSWD}
+        uc:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://${NS_UC_DB_SERVER}/ns_uc?useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true&autoReconnect=true&allowMultiQueries=true
+          username: ${NS_UC_DB_USERNAME}
+          password: ${NS_UC_DB_PASSWD}
+    hikari:
+      minimum-idle: 5
+      idle-timeout: 180000
+      maximum-pool-size: 10
+      auto-commit: true
+      pool-name: HikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  cloud:
+    nacos:
+      discovery:
+        namespace: ${NACOS_NAMESPACE:${spring.profiles.active}}
+        group: DEFAULT_GROUP
+        server-addr: ${NACOS_SERVER}
+        username: ${NACOS_USERNAME:nacos}
+        password: ${NACOS_PASSWD:nacos}
+      config:
+        namespace: ${NACOS_NAMESPACE:${spring.profiles.active}}
+        group: DEFAULT_GROUP
+        server-addr: ${NACOS_SERVER}
+        username: ${NACOS_USERNAME:nacos}
+        password: ${NACOS_PASSWD:nacos}
+        file-extension: yaml
+        refresh-enabled: true
+        max-retry: 5
+  config:
+    import:
+      - optional:nacos:/bos-op-config.yaml
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+dubbo:
+  protocol:
+    name: dubbo
+    port: 20891
+  application:
+    name: dubbo-${spring.application.name}
+    qos-enable: false
+  registry:
+    address: nacos://${spring.cloud.nacos.discovery.server-addr}
+    username: ${spring.cloud.nacos.discovery.username}
+    password: ${spring.cloud.nacos.discovery.password}
+    register-mode: instance
+    group: dubbo
+    parameters:
+      namespace: ${spring.cloud.nacos.discovery.namespace}
+  metadata-report:
+    group: dubbo
+    parameters:
+      namespace: ${spring.cloud.nacos.discovery.namespace}
+
+mybatis:
+  executor-type: REUSE
+  mapper-locations: classpath*:META-INF/mapper/*.xml
+  type-aliases-package: com.luoge.ns.invoice.entity
+  configuration:
+    database-id: mysql
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 5
+pagehelper:
+  helperDialect: mysql
+  params: count=countSql;pageNum=pageNo;pageSize=pageSize
+  supportMethodsArguments: true
+
+jetcache:
+  statIntervalMinutes: 300
+  areaInCacheName: false
+  local:
+    default:
+      type: caffeine
+      keyConvertor: fastjson2
+      limit: 100
+      expireAfterWriteInMillis: 100000
+
+bos:
+  file:
+    temporary-path: ${BOS_FILE_TEMPORARY_PATH:/home/luoge/files/temp}
+    storage-path: ${BOS_FILE_STORAGE_PATH:/home/luoge/files/}
+
+logging:
+  level:
+    root: DEBUG
+  file:
+    path: /home/luoge/logs/bos-op
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
+  appender: ${LOG_APPENDER:FILE}

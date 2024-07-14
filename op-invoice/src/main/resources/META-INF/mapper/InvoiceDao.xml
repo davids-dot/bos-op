@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luoge.bos.op.invoice.collect.manual.InvoiceDao">
+
+    <sql id="cols">
+        <trim>
+            id,
+            org_id,
+            enterprise_id,
+            type,
+            category,
+            invoice_no,
+            invoice_code,
+            buyer_name,
+            issue_time,
+            total_amount,
+            total_tax,
+            total,
+            service_fee_rate,
+            service_fee,
+            round(income, 2) income,
+            park_provider_id,
+            park_provider_name,
+            round(park_provider_amount, 2)   park_provider_amount,
+            park_provider_fee,
+            round(park_provider_total_tax, 2) park_provider_total_tax,
+            park_provider_value_added_tax,
+            park_provider_additional_tax,
+            park_provider_water_tax,
+            park_provider_stamp_tax,
+            park_provider_income_tax,
+            park_enterprise_distributor_id,
+            park_enterprise_distributor_name,
+            round(park_enterprise_distributor_fee, 2) park_enterprise_distributor_fee,
+            source_type,
+            invoice_tax_rate,
+            business_id,
+            create_time,
+            update_time
+        </trim>
+    </sql>
+
+    <insert id="batchInsertOrIgnore">
+        insert ignore into inv_invoice(id, org_id, enterprise_id,
+        type, category, invoice_no, invoice_code,
+        buyer_name, issue_time, total_amount,
+        total_tax, total, service_fee_rate,
+        service_fee, source_type,
+        park_enterprise_id, park_enterprise_name,
+        invoice_tax_rate, business_id,
+        create_time, update_time)
+        values
+        <foreach collection="invoices" item="invoice" separator=",">
+            (
+            #{invoice.id}, #{invoice.orgId}, #{invoice.enterpriseId},
+            #{invoice.type},#{invoice.category}, #{invoice.invoiceNo}, #{invoice.invoiceCode},
+            #{invoice.buyerName}, #{invoice.issueTime},
+            #{invoice.totalAmount}, #{invoice.totalTax}, #{invoice.total},
+            #{invoice.serviceFeeRate}, #{invoice.serviceFee}, #{invoice.sourceType},
+            #{invoice.parkEnterpriseId},#{invoice.parkEnterpriseName},
+            #{invoice.invoiceTaxRate}, #{invoice.businessId},
+            #{invoice.createTime}, #{invoice.updateTime}
+            )
+        </foreach>
+    </insert>
+
+
+    <select id="summaryInvoiceAmountFee"
+            resultType="com.luoge.bos.op.invoice.model.query.EnterpriseInvoiceSummaryBO">
+        select sum(total)       total,
+               sum(service_fee) service_fee
+        from inv_invoice
+        where org_id = #{orgId}
+          and enterprise_id = #{enterpriseId}
+          and issue_time >= #{startTime}
+          and #{endTime} > issue_time
+    </select>
+
+    <select id="summaryMonthFee" resultType="com.luoge.bos.op.invoice.model.report.ParkEnterpriseReportBO">
+        select enterprise_id,
+               DATE_FORMAT(issue_time, '%Y-%m-01 00:00:00')       month,
+               sum(total)                                         invoice_total,
+               sum(total_amount)                                  invoice_total_amount,
+               sum(service_fee)                                   service_fee,
+               sum(total_tax)                                     invoice_total_tax,
+               sum(case when type = 81 then total_tax else 0 end) invoice_special_tax,
+               sum(case when type = 82 then total_tax else 0 end) invoice_normal_tax,
+               sum(total * coalesce(invoice_tax_rate, 0))                                     virtual_invoice_total_tax,
+               sum(case when type = 81 then total * coalesce(invoice_tax_rate, 0) else 0 end) virtual_invoice_special_tax,
+               sum(case when type = 82 then total * coalesce(invoice_tax_rate, 0) else 0 end) virtual_invoice_normal_tax
+        from inv_invoice
+        where org_id = #{orgId}
+          and enterprise_id = #{enterpriseId}
+          and issue_time >= #{startTime}
+          and #{endTime} > issue_time
+        group by enterprise_id,
+                 DATE_FORMAT(issue_time, '%Y-%m-01 00:00:00')
+    </select>
+
+    <select id="sumYearInvoiceAmount" resultType="java.math.BigDecimal">
+        select coalesce(
+                       sum(case
+                               when type = 81 then total_amount
+                               when type = 82 then total
+                               else 0
+                           end), 0)
+                   as total
+        from inv_invoice
+        where org_id = #{orgId}
+          and enterprise_id = #{enterpriseId}
+          and issue_time >= #{startTime}
+          and #{endTime} > issue_time
+    </select>
+
+    <select id="listManualInvoice" resultType="com.luoge.bos.op.invoice.model.collect.InvoiceBO">
+        SELECT
+        a.id,
+        a.park_provider_name,
+        a.park_enterprise_name enterprise_name,
+        a.service_fee_rate,
+        a.total,
+        a.service_fee,
+        a.issue_time,
+        a.create_time
+        FROM
+        inv_invoice a
+        <where>
+            -- 补录的发票
+            a.source_type = 2
+            <if test="parkProviderId != null and parkProviderId != ''">
+                and a.park_provider_id =#{parkProviderId}
+            </if>
+            <if test="enterpriseName != null and enterpriseName != ''">
+                and a.park_enterprise_name like concat ('%',#{enterpriseName},'%')
+            </if>
+            <if test="startTime != null">
+                and a.issue_time >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and #{endTime} > a.issue_time
+            </if>
+        </where>
+        order by issue_time desc
+    </select>
+
+    <select id="getDetail" resultType="com.luoge.bos.op.invoice.entity.InvoiceDO">
+        select
+        <include refid="cols"/>
+        from inv_invoice
+        where id = #{id}
+    </select>
+
+    <select id="listEnterpriseInvoicesByPage" resultType="com.luoge.bos.op.invoice.entity.InvoiceDO">
+        select
+        <include refid="cols"/>
+        from inv_invoice
+        where enterprise_id = #{enterpriseId}
+          and issue_time >= #{startTime}
+          and #{endTime} > issue_time
+        order by issue_time
+    </select>
+
+
+    <select id="sumEnterpriseFee" resultType="com.luoge.bos.op.invoice.model.query.EnterpriseFeeBO">
+        select
+        i.park_enterprise_id enterprise_id,
+        sum(COALESCE(i.total,0)) total_amount,
+        sum(COALESCE(i.service_fee,0)) total_fee,
+        round(sum(COALESCE(i.park_provider_amount,0)), 2) park_provider_amount,
+        round(sum(COALESCE(i.park_enterprise_distributor_fee,0)), 2) distributor_fee,
+        round(sum(COALESCE(i.income, 0)), 2) income
+        from inv_invoice i
+        <where>
+            <if test="startTime != null">
+                and i.issue_time >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and #{endTime} > i.issue_time
+            </if>
+            <if test="enterpriseIds.size > 0">
+                and i.park_enterprise_id in
+                <foreach collection="enterpriseIds" item="enterpriseId" open="(" close=")" separator=",">
+                    #{enterpriseId}
+                </foreach>
+            </if>
+        </where>
+        group by i.park_enterprise_id
+    </select>
+
+
+    <select id="listEnterpriseForFee" resultType="com.luoge.bos.op.invoice.model.query.EnterpriseFeeBO">
+        select
+        e.enterprise_id,
+        e.enterprise_name,
+        sum(COALESCE(i.total,0)) total_amount,
+        sum(COALESCE(i.service_fee,0)) total_fee,
+        max(p.name) park_provider_name,
+        sum(COALESCE(i.park_provider_amount,0)) park_provider_amount,
+        max(d.name) distributor_name,
+        sum(COALESCE(i.park_enterprise_distributor_fee,0)) distributor_fee,
+        sum(COALESCE(i.income, 0)) income
+        from inv_park_enterprise e
+        left join inv_invoice i
+        on i.enterprise_id = e.enterprise_id
+        <if test="startTime != null">
+            and i.issue_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and #{endTime} > i.issue_time
+        </if>
+        left join inv_park_provider p
+        on e.park_provider_id = p.id
+        left join inv_park_enterprise_distributor d
+        on e.distributor_id = d.id
+        <where>
+            <if test="name != null and name != ''">
+                and e.enterprise_name like concat('%',#{name},'%')
+            </if>
+            <if test="providerId > 0 ">
+                and e.park_provider_id = #{providerId}
+            </if>
+            <if test="distributorId > 0 ">
+                and e.distributor_id = #{distributorId}
+            </if>
+        </where>
+        group by e.enterprise_id, e.enterprise_name
+    </select>
+
+    <select id="summaryEnterpriseFee"
+            resultType="com.luoge.bos.op.invoice.model.query.EnterpriseInvoiceSummaryBO">
+        select
+        sum(COALESCE(i.total,0)) total,
+        sum(COALESCE(i.service_fee,0)) service_fee,
+        round(sum(COALESCE(i.park_provider_amount,0)), 2) park_provider_amount,
+        round(sum(COALESCE(i.park_enterprise_distributor_fee,0)), 2) distributor_fee,
+        round(sum(COALESCE(i.income, 0)), 2) income
+        from inv_invoice i
+        <where>
+            <if test="startTime != null">
+                and i.issue_time >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and #{endTime} > i.issue_time
+            </if>
+            <if test="enterpriseIds.size > 0">
+                and i.park_enterprise_id in
+                <foreach collection="enterpriseIds" item="enterpriseId" open="(" close=")" separator=",">
+                    #{enterpriseId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="listEnterpriseInvoices" resultType="com.luoge.bos.op.invoice.entity.InvoiceDO">
+        select
+        <include refid="cols"/>
+        from inv_invoice
+        where enterprise_id = #{enterpriseId}
+        and issue_time >= #{startTime}
+        and #{endTime} > issue_time
+        order by issue_time
+    </select>
+
+
+    <select id="summaryEnterpriseReport"
+            resultType="com.luoge.bos.op.invoice.model.query.EnterpriseInvoiceSummaryBO">
+        select
+        sum(total) total,
+        sum(service_fee) service_fee
+        from inv_invoice
+        <where>
+            <if test="name != null and name != ''">
+                and enterprise_name like concat('%',#{name} ,'%')
+            </if>
+            <if test="startTime != null">
+                and issue_time >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and #{endTime} > issue_time
+            </if>
+        </where>
+    </select>
+
+    <select id="summaryHistoryTax" resultType="com.luoge.bos.op.invoice.model.collect.SummaryHistoryTaxBO">
+        select enterprise_id,
+               sum(case when type = 81 then total_tax else 0 end) special_tax,
+               sum(case when type = 82 then total_tax else 0 end) normal_tax,
+               sum(case when type = 81 then total * coalesce(invoice_tax_rate, 0) else 0 end) virtual_special_tax,
+               sum(case when type = 82 then total * coalesce(invoice_tax_rate, 0) else 0 end) virtual_normal_tax
+        from inv_invoice
+        where org_id = #{orgId}
+          and enterprise_id = #{enterpriseId}
+          and issue_time >= #{startTime}
+          and #{endTime} > issue_time
+        group by enterprise_id
+    </select>
+
+    <select id="summarySeasonDaily" resultType="com.luoge.bos.op.invoice.model.collect.SeasonSummaryDailyBO">
+        select enterprise_id,
+               sum(total)                                         invoice_total,
+               sum(total_amount)                                  invoice_total_amount,
+               sum(total_tax)                                     invoice_total_tax,
+               sum(case when type = 81 then total_tax else 0 end) invoice_special_tax,
+               sum(case when type = 82 then total_tax else 0 end) invoice_normal_tax,
+               sum(total * coalesce(invoice_tax_rate, 0))                                     virtual_invoice_total_tax,
+               sum(case when type = 81 then total * coalesce(invoice_tax_rate, 0) else 0 end) virtual_invoice_special_tax,
+               sum(case when type = 82 then total * coalesce(invoice_tax_rate, 0) else 0 end) virtual_invoice_normal_tax,
+
+               sum(coalesce(park_provider_value_added_tax, 0))    history_value_tax
+        from inv_invoice
+        where org_id = #{orgId}
+          and enterprise_id = #{enterpriseId}
+          and issue_time >= #{startTime}
+          and #{endTime} > issue_time
+          and #{endTime} > create_time
+        group by enterprise_id
+    </select>
+
+    <select id="summaryYearDaily" resultType="com.luoge.bos.op.invoice.model.collect.YearSummaryDailyBO">
+        select enterprise_id,
+               coalesce(
+                       sum(case
+                               when type = 81 then total_amount
+                               when type = 82 then total
+                               else 0
+                           end), 0)                       issue_amount,
+               sum(coalesce(park_provider_income_tax, 0)) income_tax
+        from inv_invoice
+        where org_id = #{orgId}
+          and enterprise_id = #{enterpriseId}
+          and issue_time >= #{startTime}
+          and #{endTime} > issue_time
+          and #{endTime} > create_time
+        group by enterprise_id
+    </select>
+
+    <select id="listTodayInvoices" resultType="com.luoge.bos.op.invoice.entity.InvoiceDO">
+        select
+        <include refid="cols"/>
+        from inv_invoice
+        where org_id = #{orgId}
+        and enterprise_id = #{enterpriseId}
+        and create_time >= #{startTime}
+        and income is null
+        and (source_type = 1 or (source_type = 2 and #{endTime} > create_time))
+        order by issue_time
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countToComputeInvoice" resultType="java.lang.Integer">
+        select count(*)
+        from inv_invoice
+        where org_id = #{orgId}
+          and enterprise_id = #{enterpriseId}
+          and create_time >= #{startTime}
+          and income is null
+          and (source_type = 1 or (source_type = 2 and #{endTime} > create_time))
+    </select>
+
+    <update id="clearInvoicesIncome">
+        update inv_invoice
+        set income = null,
+        update_time = #{updateTime}
+        where create_time >= #{startTime}
+        and #{endTime} > create_time
+        <if test="enterpriseId > 0">
+            and enterprise_id = #{enterpriseId}
+        </if>
+    </update>
+
+    <insert id="add">
+        insert into inv_invoice(id, org_id, enterprise_id, type, invoice_no, buyer_name, issue_time,
+                                total_amount, total_tax, total, service_fee_rate, service_fee, source_type,
+                                category, park_enterprise_id, park_enterprise_name,
+                                invoice_tax_rate, business_id,
+                                create_time, update_time)
+        VALUES (#{id}, #{orgId}, #{enterpriseId}, #{type}, #{invoiceNo}, #{buyerName}, #{issueTime},
+                #{totalAmount}, #{totalTax}, #{total}, #{serviceFeeRate}, #{serviceFee}, #{sourceType},
+                #{category}, #{parkEnterpriseId}, #{parkEnterpriseName},
+                #{invoiceTaxRate}, #{businessId},
+                #{createTime}, #{updateTime})
+    </insert>
+
+    <insert id="batchUpdate">
+        insert into inv_invoice(id, org_id, enterprise_id,
+        type, category, invoice_no, invoice_code,
+        buyer_name, issue_time, total_amount,
+        total_tax, total, service_fee_rate,
+        service_fee, source_type, create_time, update_time,
+        income, park_provider_id, park_provider_name,
+        park_provider_amount,park_provider_fee,park_provider_total_tax,
+        park_provider_value_added_tax,park_provider_additional_tax,
+        park_provider_water_tax,park_provider_stamp_tax,park_provider_income_tax,
+        park_enterprise_distributor_id, park_enterprise_distributor_name,
+        park_enterprise_distributor_fee, business_id)
+        values
+        <foreach collection="supplementInvoices" item="invoice" separator=",">
+            (
+            #{invoice.id}, #{invoice.orgId}, #{invoice.enterpriseId},
+            #{invoice.type},#{invoice.category}, #{invoice.invoiceNo}, #{invoice.invoiceCode},
+            #{invoice.buyerName}, #{invoice.issueTime},
+            #{invoice.totalAmount}, #{invoice.totalTax}, #{invoice.total},
+            #{invoice.serviceFeeRate}, #{invoice.serviceFee}, #{invoice.sourceType},
+            #{invoice.createTime}, #{invoice.updateTime},
+            #{invoice.income}, #{invoice.parkProviderId}, #{invoice.parkProviderName},
+            #{invoice.parkProviderAmount}, #{invoice.parkProviderFee}, #{invoice.parkProviderTotalTax},
+            #{invoice.parkProviderValueAddedTax}, #{invoice.parkProviderAdditionalTax},
+            #{invoice.parkProviderWaterTax}, #{invoice.parkProviderStampTax}, #{invoice.parkProviderIncomeTax},
+            #{invoice.parkEnterpriseDistributorId}, #{invoice.parkEnterpriseDistributorName},
+            #{invoice.parkEnterpriseDistributorFee}, #{invoice.businessId}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        income = values(income),
+        park_provider_id = values(park_provider_id),
+        park_provider_name = values(park_provider_name),
+        park_provider_amount = values(park_provider_amount),
+        park_provider_fee = values(park_provider_fee),
+        park_provider_total_tax = values(park_provider_total_tax),
+        park_provider_value_added_tax = values(park_provider_value_added_tax),
+        park_provider_additional_tax = values(park_provider_additional_tax),
+        park_provider_water_tax = values(park_provider_water_tax),
+        park_provider_stamp_tax = values(park_provider_stamp_tax),
+        park_provider_income_tax = values(park_provider_income_tax),
+        park_enterprise_distributor_id = values(park_enterprise_distributor_id),
+        park_enterprise_distributor_name = values(park_enterprise_distributor_name),
+        park_enterprise_distributor_fee = values(park_enterprise_distributor_fee),
+        business_id = values(business_id),
+        update_time = values(update_time)
+    </insert>
+
+    <delete id="delete">
+        delete
+        from inv_invoice
+        where id = #{id}
+          and source_type = 2
+    </delete>
+
+</mapper>

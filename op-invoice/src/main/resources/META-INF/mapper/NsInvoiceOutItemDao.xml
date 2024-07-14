@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luoge.bos.op.invoice.apply.NsInvoiceOutItemDao">
+    <sql id="cols">
+        <trim>
+            id, org_id, enterprise_id, invoice_id, row_no, product_id,
+            name, spec, unit, quantity, price, amount,tax_rate,
+            tax_amount, tax_code, type, special_type, create_time
+        </trim>
+    </sql>
+
+    <select id="selectByInvoiceIds" resultType="com.luoge.bos.op.invoice.entity.invoice.InvoiceOutItemDO">
+        select
+        <include refid="cols">
+        </include>
+        from inv_invoice_out_item
+        where org_id = #{orgId}
+        <if test="invoiceIds != null and invoiceIds.size() > 0">
+            and invoice_id in
+            <foreach collection="invoiceIds" item="invoiceId" separator="," open="(" close=")">
+                #{invoiceId}
+            </foreach>
+        </if>
+        order by id
+    </select>
+
+
+    <insert id="batchSave" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO inv_invoice_out_item
+        (org_id, enterprise_id, invoice_id, row_no, product_id,
+        name, spec, unit, quantity,
+        price, amount, tax_rate,tax_amount,
+        tax_code,type, special_type, create_time, include_tax_amount, include_tax_price)
+        VALUES
+        <foreach collection="items" item="item" separator=",">
+            (
+            #{item.orgId}, #{item.enterpriseId}, #{item.invoiceId}, #{item.rowNo}, #{item.productId},
+            #{item.name}, #{item.spec}, #{item.unit}, #{item.quantity},
+            #{item.price}, #{item.amount}, #{item.taxRate},#{item.taxAmount},
+            #{item.taxCode},#{item.type}, #{item.specialType}, #{item.createTime},
+            #{item.includeTaxAmount}, #{item.includeTaxPrice}
+            )
+        </foreach>
+    </insert>
+</mapper>

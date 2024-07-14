@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luoge.bos.op.invoice.report.provider.ParkProviderReportDao">
+
+    <sql id="cols">
+        <trim>
+            id, park_provider_id, park_provider_name,
+            month, park_provider_value_added_tax, park_provider_additional_tax,
+            park_provider_water_tax, park_provider_stamp_tax,
+            park_provider_income_tax, park_provider_fee,
+            create_time, update_time,park_provider_total_tax
+        </trim>
+    </sql>
+
+    <select id="listByName" resultType="com.luoge.bos.op.invoice.entity.ParkProviderReportDO">
+        select
+        <include refid="cols"/>
+        from inv_report_month_park_provider
+        <where>
+            <if test="providerId > 0">
+                and park_provider_id = #{providerId}
+            </if>
+            <if test="months != null and months.size > 0">
+                and month in
+                <foreach collection="months" item="month" separator="," open="(" close=")">
+                    #{month}
+                </foreach>
+            </if>
+        </where>
+        order by park_provider_id, month
+    </select>
+
+    <select id="list" resultType="com.luoge.bos.op.invoice.entity.ParkProviderReportDO">
+        select
+        <include refid="cols"/>
+        from inv_report_month_park_provider
+        <where>
+            <if test="providerId > 0">
+                and park_provider_id = #{providerId}
+            </if>
+            <if test="months != null and months.size > 0">
+                and month in
+                <foreach collection="months" item="months" separator="," open="(" close=")">
+                    #{months}
+                </foreach>
+            </if>
+        </where>
+        order by park_provider_id, month
+    </select>
+
+    <insert id="batchInsertOnConflictUpdate">
+        insert into inv_report_month_park_provider (park_provider_id, park_provider_name,
+        month, park_provider_value_added_tax, park_provider_additional_tax,
+        park_provider_water_tax, park_provider_stamp_tax,
+        park_provider_income_tax, park_provider_fee,
+        park_provider_total_tax,
+        create_time, update_time)
+        values
+        <foreach collection="reports" item="report" separator=",">
+            (#{report.parkProviderId}, #{report.parkProviderName},
+            #{report.month}, #{report.parkProviderValueAddedTax},
+            #{report.parkProviderAdditionalTax},
+            #{report.parkProviderWaterTax}, #{report.parkProviderStampTax},
+            #{report.parkProviderIncomeTax}, #{report.parkProviderFee},
+            #{report.parkProviderTotalTax},
+            #{report.createTime}, #{report.updateTime})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        park_provider_value_added_tax = values(park_provider_value_added_tax),
+        park_provider_additional_tax = values(park_provider_additional_tax),
+        park_provider_water_tax = values(park_provider_water_tax),
+        park_provider_stamp_tax = values(park_provider_stamp_tax),
+        park_provider_income_tax = values(park_provider_income_tax),
+        park_provider_total_tax = values(park_provider_total_tax),
+        park_provider_fee = values(park_provider_fee),
+        update_time = values(update_time)
+    </insert>
+
+</mapper>

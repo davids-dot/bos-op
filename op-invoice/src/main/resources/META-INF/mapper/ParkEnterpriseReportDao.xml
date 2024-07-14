@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luoge.bos.op.invoice.report.enterprise.ParkEnterpriseReportDao">
+
+    <sql id="cols">
+        <trim>
+            id, org_id, enterprise_id,
+            enterprise_name, month, invoice_total_amount,
+            service_fee, customer, customer_manager,
+            park_provider_id, park_provider_name, park_provider_amount,
+            park_provider_fee, park_provider_total_tax,
+            park_enterprise_distributor_id,park_enterprise_distributor_name,
+            park_enterprise_distributor_fee, park_provider_value_added_tax,
+            park_provider_additional_tax, park_provider_water_tax,
+            park_provider_stamp_tax, park_provider_income_tax,
+            invoice_total_tax, invoice_total, create_time,
+            update_time
+        </trim>
+    </sql>
+
+    <insert id="batchInsertOnConflictUpdate">
+        insert into inv_report_month_park_enterprise (org_id, enterprise_id,
+        enterprise_name, month, invoice_total_amount,
+        service_fee, customer, customer_manager,
+        park_provider_id, park_provider_name,
+        park_provider_amount, park_provider_fee,
+        park_provider_total_tax, park_enterprise_distributor_id, park_enterprise_distributor_name,
+        park_enterprise_distributor_fee, park_provider_value_added_tax,
+        park_provider_additional_tax, park_provider_water_tax,
+        park_provider_stamp_tax, park_provider_income_tax,
+        invoice_total_tax, invoice_total,
+        create_time, update_time)
+        values
+        <foreach collection="reports" item="report" separator=",">
+            (
+            #{report.orgId}, #{report.enterpriseId},
+            #{report.enterpriseName}, #{report.month}, #{report.invoiceTotalAmount},
+            #{report.serviceFee}, #{report.customer}, #{report.customerManager},
+            #{report.parkProviderId}, #{report.parkProviderName}, #{report.parkProviderAmount},
+            #{report.parkProviderFee},#{report.parkProviderTotalTax},
+            #{report.parkEnterpriseDistributorId},#{report.parkEnterpriseDistributorName},
+            #{report.parkEnterpriseDistributorFee}, #{report.parkProviderValueAddedTax},
+            #{report.parkProviderAdditionalTax}, #{report.parkProviderWaterTax},
+            #{report.parkProviderStampTax}, #{report.parkProviderIncomeTax},
+            #{report.invoiceTotalTax}, #{report.invoiceTotal},
+            #{report.createTime},#{report.updateTime}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        invoice_total_amount = values(invoice_total_amount),
+        service_fee = values(service_fee),
+        park_provider_id = values(park_provider_id),
+        park_provider_name = values(park_provider_name),
+        park_enterprise_distributor_id = values(park_enterprise_distributor_id),
+        park_enterprise_distributor_name = values(park_enterprise_distributor_name),
+        park_provider_amount = values(park_provider_amount),
+        park_provider_fee = values(park_provider_fee),
+        park_provider_total_tax = values(park_provider_total_tax),
+        park_enterprise_distributor_fee = values(park_enterprise_distributor_fee),
+        park_provider_value_added_tax = values(park_provider_value_added_tax),
+        park_provider_additional_tax = values(park_provider_additional_tax),
+        park_provider_water_tax = values(park_provider_water_tax),
+        park_provider_stamp_tax = values(park_provider_stamp_tax),
+        park_provider_income_tax = values(park_provider_income_tax),
+        invoice_total_tax = values(invoice_total_tax),
+        invoice_total = values(invoice_total),
+        update_time = values(update_time)
+    </insert>
+
+    <select id="summaryHistory" resultType="com.luoge.bos.op.invoice.model.collect.SummaryHistoryBO">
+        select
+        sum(invoice_total) invoice_total,
+        sum(invoice_total_amount) invoice_total_amount,
+        sum(invoice_total_tax) invoice_total_tax,
+        sum(park_provider_value_added_tax) value_added_tax
+        from inv_report_month_park_enterprise
+        where org_id = #{orgId}
+        and enterprise_id = #{enterpriseId}
+        and month in
+        <foreach collection="months" item="month" open="(" close=")" separator=",">
+            #{month}
+        </foreach>
+    </select>
+
+    <select id="sumYearHistoryTax" resultType="java.math.BigDecimal">
+        select
+        coalesce(sum(coalesce(park_provider_income_tax,0)), 0) year_income_tax
+        from inv_report_month_park_enterprise
+        where org_id = #{orgId}
+        and enterprise_id = #{enterpriseId}
+        and month in
+        <foreach collection="months" item="month" open="(" close=")" separator=",">
+            #{month}
+        </foreach>
+    </select>
+
+    <select id="listProviderMonthReportDetailByPage" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+        select
+        <include refid="cols"/>
+        from inv_report_month_park_enterprise
+        where park_provider_id = #{providerId}
+        and month = #{month}
+        order by enterprise_id
+    </select>
+
+    <select id="listProviderMonthReportDetail" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+        select
+        <include refid="cols"/>
+        from inv_report_month_park_enterprise
+        where park_provider_id = #{providerId}
+        and month = #{month}
+        order by enterprise_id
+    </select>
+
+    <select id="listDistributorMonthReportDetailByPage"
+            resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+        select
+        <include refid="cols"/>
+        from inv_report_month_park_enterprise
+        where park_enterprise_distributor_id = #{distributorId}
+        and month = #{month}
+        order by enterprise_id
+    </select>
+
+    <select id="listDistributorMonthReportDetail"
+            resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+        select
+        <include refid="cols"/>
+        from inv_report_month_park_enterprise
+        where park_enterprise_distributor_id = #{distributorId}
+        and month = #{month}
+        order by enterprise_id
+    </select>
+
+    <sql id="listCondition">
+        <where>
+            <if test="providerId > 0">
+                and park_provider_id = #{providerId}
+            </if>
+            <if test="enterpriseName != null and enterpriseName != '' ">
+                and enterprise_name like concat('%',#{enterpriseName},'%')
+            </if>
+            <if test="customerManager != null and customerManager != '' ">
+                and customer_manager like concat('%',#{customerManager},'%')
+            </if>
+            <if test="customer!= null and customer != '' ">
+                and customer like concat('%',#{customer},'%')
+            </if>
+            <if test="distributorName != null and distributorName != '' ">
+                and park_enterprise_distributor_name like concat('%',#{distributorName},'%')
+            </if>
+            <if test="months != null and months.size > 0">
+                and month in
+                <foreach collection="months" item="month" open="(" close=")" separator=",">
+                    #{month}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+
+    <select id="listEnterpriseReportByPage" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+        select
+        <include refid="cols"/>
+        from inv_report_month_park_enterprise
+        <include refid="listCondition"/>
+        order by enterprise_id, month
+    </select>
+
+    <select id="listEnterpriseReport" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+        select
+        <include refid="cols"/>
+        from inv_report_month_park_enterprise
+        <include refid="listCondition"/>
+        order by enterprise_id, month
+    </select>
+
+    <select id="summaryEnterpriseReport"
+            resultType="com.luoge.bos.op.invoice.model.report.SummaryEnterpriseReportBO">
+        select
+        sum(invoice_total) total,
+        sum(service_fee) service_fee,
+        sum(park_provider_amount) provider_amount,
+        sum(park_enterprise_distributor_fee) distributor_amount
+        from inv_report_month_park_enterprise
+        <include refid="listCondition"/>
+    </select>
+
+    <select id="listParkProvidersReports" resultType="com.luoge.bos.op.invoice.entity.ParkProviderReportDO">
+        select
+            park_provider_id,
+            park_provider_name,
+            month,
+            sum(coalesce(park_provider_value_added_tax,0)) park_provider_value_added_tax,
+            sum(coalesce(park_provider_additional_tax,0)) park_provider_additional_tax,
+            sum(coalesce(park_provider_water_tax,0)) park_provider_water_tax,
+            sum(coalesce(park_provider_stamp_tax,0)) park_provider_stamp_tax,
+            sum(coalesce(park_provider_income_tax,0)) park_provider_income_tax,
+            sum(coalesce(park_provider_total_tax,0)) park_provider_total_tax,
+            sum(coalesce(park_provider_fee,0)) park_provider_fee
+        from inv_report_month_park_enterprise
+        where month = #{month}
+        and park_provider_id in
+        <foreach collection="providerIds" item="providerId" open="(" close=")" separator=",">
+            #{providerId}
+        </foreach>
+        group by park_provider_id, park_provider_name, month
+    </select>
+
+    <select id="listDistributorsReports" resultType="com.luoge.bos.op.invoice.entity.DistributorReportDO">
+        select
+        park_enterprise_distributor_id,
+        park_enterprise_distributor_name,
+        month,
+        sum(invoice_total) total_amount,
+        sum(park_enterprise_distributor_fee) total_fee
+        from inv_report_month_park_enterprise
+        where month = #{month}
+        and park_enterprise_distributor_id in
+        <foreach collection="distributorIds" item="distributorId" open="(" close=")" separator=",">
+            #{distributorId}
+        </foreach>
+        group by park_enterprise_distributor_id, park_enterprise_distributor_name, month
+    </select>
+
+
+
+
+</mapper>

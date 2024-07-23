@@ -12,7 +12,6 @@ INSERT INTO `iam_app` (`id`, `code`, `name`, `logo`, `base_url`, `status`, `rema
 VALUES (1, 'invoice', '北海云票', NULL, NULL, 1, '北海云票', '2023-09-25 20:55:52');
 COMMIT;
 
-
 BEGIN;
 INSERT INTO `iam_authorization` (`id`, `org_id`, `target_type`, `target_id`, `permission_code`, `create_time`)
 VALUES (16, 1, 1, 4, 'uc:setting', '2024-03-06 11:42:42');

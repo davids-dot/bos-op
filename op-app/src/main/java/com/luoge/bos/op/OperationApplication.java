@@ -1,5 +1,6 @@
 package com.luoge.bos.op;
 
+import jakarta.annotation.Resource;
 import org.dromara.x.file.storage.spring.EnableFileStorage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @SpringBootApplication(scanBasePackages = {"com.luoge.bos"})
 public class OperationApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(OperationApplication.class);
     }

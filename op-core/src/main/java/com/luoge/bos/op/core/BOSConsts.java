@@ -10,5 +10,6 @@ public interface BOSConsts {
         public static final String MASTER = "master";
         public static final String INVOICE = "invoice";
         public static final String UC = "uc";
+        public static final String BOS_UC = "bos-uc";
     }
 }

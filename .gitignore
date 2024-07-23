@@ -50,3 +50,6 @@ out/
 .run/
 **/rebel.xml
 **/*.txt
+
+
+logs/

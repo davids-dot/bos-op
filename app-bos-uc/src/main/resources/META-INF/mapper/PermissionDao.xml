@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luoge.bos.op.uc.dao.PermissionDao">
+    <select id="list" resultType="com.luoge.bos.op.uc.model.permission.PermissionVO">
+        SELECT code, name, level, seq, remark
+        FROM iam_permission
+    </select>
+
+    <select id="listPermissionMenus" resultType="com.luoge.bos.op.uc.model.permission.PermissionMenuBO">
+        SELECT permission_code, menu_id
+        FROM iam_permission_menu
+    </select>
+
+    <select id="listPermissionResources" resultType="com.luoge.bos.op.uc.model.permission.PermissionResourceBO">
+        SELECT a.url, b.permission_code
+        FROM iam_resource a,
+             iam_permission_resource b
+        WHERE a.id = b.resource_id
+    </select>
+</mapper>

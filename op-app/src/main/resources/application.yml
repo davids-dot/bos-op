@@ -1,5 +1,11 @@
 server:
   port: 9192
+  tomcat:
+    accesslog:
+      enabled: true
+      prefix: access_log.
+      suffix: .log
+    basedir: ./logs
 
 spring:
   aop:
@@ -11,6 +17,9 @@ spring:
   messages:
     basename: i18n/messages
     encoding: UTF-8
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   datasource:
     dynamic:
       enabled: true #启用动态数据源，默认true

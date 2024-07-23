@@ -5,7 +5,6 @@ import com.luoge.bos.op.invoice.util.InvokeUtil;
 import com.luoge.ns.core.R;
 import com.luoge.ns.uc.model.msg.WxPushMsgTemplate;
 import jakarta.annotation.Resource;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ public class NotificationService {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
-    @DubboReference(timeout = 15000)
     private com.luoge.ns.uc.dubbo.NotificationService notificationService;
 
     @Resource

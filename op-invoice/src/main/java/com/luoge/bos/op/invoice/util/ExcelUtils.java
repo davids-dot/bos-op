@@ -9,12 +9,12 @@ import com.alibaba.excel.write.handler.context.CellWriteHandlerContext;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.style.column.AbstractColumnWidthStyleStrategy;
 import com.alibaba.fastjson2.JSON;
+import com.luoge.bos.common.HttpUtil;
 import com.luoge.bos.op.core.BosAppCode;
 import com.luoge.bos.op.core.utils.StrUtil;
 import com.luoge.ns.core.R;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.http.HttpStatus;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,7 +122,7 @@ public class ExcelUtils {
             LOGGER.error("下载文件失败：", e);
             // 重置response
             response.reset();
-            HttpUtil.writeError(response, HttpStatus.SC_INTERNAL_SERVER_ERROR, JSON.toJSONString(R.fail(BosAppCode.EXPORT_FILE_FAIL)));
+            HttpUtil.writeRes(response, HttpStatus.SC_INTERNAL_SERVER_ERROR, JSON.toJSONString(R.fail(BosAppCode.EXPORT_FILE_FAIL)));
         }
     }
 

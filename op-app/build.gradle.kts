@@ -12,6 +12,8 @@ tasks.test {
 dependencies {
     implementation("com.luoge.ns:uc-api:1.1.0-SNAPSHOT")
     implementation(project(":op-invoice"))
+    implementation(project(":app-bos-uc"))
+    implementation(project(":op-gateway"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -37,9 +39,19 @@ dependencies {
     implementation("com.alicp.jetcache:jetcache-starter-redis:2.7.4")
 
     implementation("com.baomidou:dynamic-datasource-spring-boot3-starter:4.2.0")
-
     implementation("org.mockito:mockito-inline:4.1.0")
     testImplementation("org.testng:testng:7.7.0")
+}
+
+
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+tasks.register<Copy>("copyTask") {
+    from("src/main/resources")
+    into("build/output")
+    // 设置重复文件处理策略
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks {

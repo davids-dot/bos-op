@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.luoge.bos.op.invoice.park.provider.ParkProviderDao">
+<mapper namespace="com.luoge.bos.invoice.park.provider.ParkProviderDao">
     <sql id="cols">
         <trim>
             id, name, remark, status,
@@ -58,7 +58,7 @@
         where id = #{id}
     </update>
 
-    <select id="list" resultType="com.luoge.bos.op.invoice.entity.ParkProviderDO">
+    <select id="list" resultType="com.luoge.bos.invoice.entity.ParkProviderDO">
         select id,name,remark,status,create_time
         from inv_park_provider
         <where>
@@ -69,7 +69,7 @@
         order by status asc ,create_time desc
     </select>
 
-    <select id="get" resultType="com.luoge.bos.op.invoice.entity.ParkProviderDO">
+    <select id="get" resultType="com.luoge.bos.invoice.entity.ParkProviderDO">
         select id,
                name,
                remark,
@@ -113,20 +113,20 @@
         where name = #{name}
     </select>
 
-    <select id="getByName" resultType="com.luoge.bos.op.invoice.entity.ParkProviderDO">
+    <select id="getByName" resultType="com.luoge.bos.invoice.entity.ParkProviderDO">
         select
         <include refid="cols"/>
         from inv_park_provider
         where name = #{name}
     </select>
 
-    <select id="listAll" resultType="com.luoge.bos.op.invoice.entity.ParkProviderDO">
+    <select id="listAll" resultType="com.luoge.bos.invoice.entity.ParkProviderDO">
         select
         <include refid="cols"/>
         from inv_park_provider
     </select>
 
-    <select id="listByStatus" resultType="com.luoge.bos.op.invoice.entity.ParkProviderDO">
+    <select id="listByStatus" resultType="com.luoge.bos.invoice.entity.ParkProviderDO">
         select
         <include refid="cols"/>
         from inv_park_provider

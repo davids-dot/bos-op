@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.luoge.bos.op.invoice.common.OperationRecordDao">
+<mapper namespace="com.luoge.bos.invoice.common.OperationRecordDao">
 
     <sql id="cols">
         <trim>
@@ -8,7 +8,7 @@
         </trim>
     </sql>
 
-    <insert id="insert" parameterType="com.luoge.bos.op.invoice.entity.invoice.OperationRecordDO"
+    <insert id="insert" parameterType="com.luoge.bos.invoice.entity.invoice.OperationRecordDO"
             useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         insert into inv_operation_record (business_id, business_type,
                                           operation_type, operation_remark, operator_id,
@@ -18,7 +18,7 @@
                 #{createTime,jdbcType=TIMESTAMP})
     </insert>
 
-    <select id="listByBusinessId" resultType="com.luoge.bos.op.invoice.entity.invoice.OperationRecordDO">
+    <select id="listByBusinessId" resultType="com.luoge.bos.invoice.entity.invoice.OperationRecordDO">
         select
         <include refid="cols"/>
         from inv_operation_record

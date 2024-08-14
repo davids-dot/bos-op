@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.luoge.bos.op.invoice.park.TaxCalculateFormulaDao">
+<mapper namespace="com.luoge.bos.invoice.park.TaxCalculateFormulaDao">
     <sql id="cols">
         <trim>
             id, tax_type, tax_type_name,formula_name,formula_expression
         </trim>
     </sql>
-    <select id="listByTaxType" resultType="com.luoge.bos.op.invoice.entity.TaxCalculateFormulaDO">
+    <select id="listByTaxType" resultType="com.luoge.bos.invoice.entity.TaxCalculateFormulaDO">
         select
         <include refid="cols"/>
         from tax_calculate_formula

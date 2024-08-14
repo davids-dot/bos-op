@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luoge.bos.invoice.park.enterprisereg.CorporateRegistrationDao">
+
+    <sql id="cols">
+        <trim>
+            id, org_id, user_id, status, park_provider_id, industry_id, id_card_front_file_id,
+            id_card_back_file_id, photo_file_id, corporate_name, corporate_id_no, corporate_phone,
+            is_bureau, candidate_enterprise_name, payment_proof_file_id, payment_amount, park_provider_account_name,
+            park_provider_account_bank, park_provider_account_no, park_provider_name, enterprise_name,
+            enterprise_tax_no, enterprise_type, enterprise_license_file_id, real_corporate_name, create_time,
+            update_time,
+            has_other_enterprise
+        </trim>
+    </sql>
+
+    <update id="update" parameterType="com.luoge.bos.invoice.entity.EnterpriseRegistrationDO">
+        update inv_enterprise_registration
+        <set>
+            <if test="orgId != null and orgId != 0">
+                org_id = #{orgId},
+            </if>
+            <if test="userId != null and userId != ''">
+                user_id = #{userId},
+            </if>
+            <if test="status != null and status != 0">
+                status = #{status},
+            </if>
+            <if test="parkProviderId != null and parkProviderId != 0">
+                park_provider_id = #{parkProviderId},
+            </if>
+            <if test="industryId != null and industryId != 0">
+                industry_id = #{industryId},
+            </if>
+            <if test="idCardFrontFileId != null and idCardFrontFileId != 0">
+                id_card_front_file_id = #{idCardFrontFileId},
+            </if>
+            <if test="idCardBackFileId != null and idCardBackFileId != 0">
+                id_card_back_file_id = #{idCardBackFileId},
+            </if>
+            <if test="photoFileId != null and photoFileId != 0">
+                photo_file_id = #{photoFileId},
+            </if>
+            <if test="corporateName != null and corporateName != ''">
+                corporate_name = #{corporateName},
+            </if>
+            <if test="corporateIdNo != null and corporateIdNo != ''">
+                corporate_id_no = #{corporateIdNo},
+            </if>
+            <if test="corporatePhone != null and corporatePhone != ''">
+                corporate_phone = #{corporatePhone},
+            </if>
+            <if test="isBureau != null">
+                is_bureau = #{isBureau},
+            </if>
+            <if test="candidateEnterpriseName != null and candidateEnterpriseName != ''">
+                candidate_enterprise_name = #{candidateEnterpriseName},
+            </if>
+            <if test="paymentProofFileId != null and paymentProofFileId != 0">
+                payment_proof_file_id = #{paymentProofFileId},
+            </if>
+            <if test="paymentAmount != null and paymentAmount != 0">
+                payment_amount = #{paymentAmount},
+            </if>
+            <if test="parkProviderAccountName != null and parkProviderAccountName != ''">
+                park_provider_account_name = #{parkProviderAccountName},
+            </if>
+            <if test="parkProviderAccountBank != null and parkProviderAccountBank != ''">
+                park_provider_account_bank = #{parkProviderAccountBank},
+            </if>
+            <if test="parkProviderAccountNo != null and parkProviderAccountNo != ''">
+                park_provider_account_no = #{parkProviderAccountNo},
+            </if>
+            <if test="parkProviderName != null and parkProviderName != ''">
+                park_provider_name = #{parkProviderName},
+            </if>
+            <if test="enterpriseName != null and enterpriseName != ''">
+                enterprise_name = #{enterpriseName},
+            </if>
+            <if test="enterpriseTaxNo != null and enterpriseTaxNo != ''">
+                enterprise_tax_no = #{enterpriseTaxNo},
+            </if>
+            <if test="enterpriseType != null and enterpriseType != 0">
+                enterprise_type = #{enterpriseType},
+            </if>
+            <if test="enterpriseLicenseFileId != null and enterpriseLicenseFileId != 0">
+                enterprise_license_file_id = #{enterpriseLicenseFileId},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id =#{id}
+    </update>
+
+    <update id="updateEnterprisePayment">
+        update inv_enterprise_registration
+        set
+            payment_proof_file_id = #{paymentProofFileId},
+            status                = #{status}
+        where id = #{id}
+    </update>
+
+    <select id="getById" parameterType="java.lang.Long"
+            resultType="com.luoge.bos.invoice.entity.EnterpriseRegistrationDO">
+        select
+        <include refid="cols"/>
+        from inv_enterprise_registration
+        where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.luoge.bos.invoice.entity.EnterpriseRegistrationDO">
+        insert into inv_enterprise_registration (id, org_id, user_id,
+                                                 status, park_provider_id, industry_id,
+                                                 id_card_front_file_id, id_card_back_file_id, photo_file_id,
+                                                 corporate_name, corporate_id_no, corporate_phone,
+                                                 is_bureau, candidate_enterprise_name, payment_proof_file_id,
+                                                 payment_amount, park_provider_account_name,
+                                                 park_provider_account_bank, park_provider_account_no,
+                                                 park_provider_name, enterprise_name, enterprise_tax_no,
+                                                 enterprise_type, enterprise_license_file_id,
+                                                 create_time, update_time,has_other_enterprise)
+        values (#{id}, #{orgId}, #{userId},
+                #{status}, #{parkProviderId}, #{industryId},
+                #{idCardFrontFileId}, #{idCardBackFileId}, #{photoFileId},
+                #{corporateName}, #{corporateIdNo}, #{corporatePhone},
+                #{isBureau}, #{candidateEnterpriseName}, #{paymentProofFileId},
+                #{paymentAmount}, #{parkProviderAccountName},
+                #{parkProviderAccountBank}, #{parkProviderAccountNo},
+                #{parkProviderName}, #{enterpriseName}, #{enterpriseTaxNo},
+                #{enterpriseType}, #{enterpriseLicenseFileId},
+                #{createTime}, #{updateTime}, #{hasOtherEnterprise})
+    </insert>
+
+    <select id="list" resultType="com.luoge.bos.invoice.entity.EnterpriseRegistrationDO">
+        select
+        <include refid="cols"/>
+        from inv_enterprise_registration
+        <where>
+            <if test="query.id != null and query.id != 0">
+                id = #{query.id}
+            </if>
+            <if test="query.corporateName != null and query.corporateName != ''">
+                and corporate_name like concat(#{query.corporateName}, '%')
+            </if>
+            <if test="query.parkProviderId != null and query.parkProviderId != 0">
+                and park_provider_id = #{query.parkProviderId}
+            </if>
+            <if test="query.status != null and query.status != 0">
+                and status = #{query.status}
+            </if>
+            <if test="query.startTime != null">
+                and create_time >= #{query.startTime}
+            </if>
+            <if test="query.endTime != null">
+                and #{query.endTime} > create_time
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="listByStatus" resultType="com.luoge.bos.invoice.entity.EnterpriseRegistrationDO">
+        select
+        <include refid="cols"/>
+        from inv_enterprise_registration
+        where org_id = #{orgId}
+        <if test="status > 0">
+            and status = #{status}
+        </if>
+        order by create_time desc
+    </select>
+
+    <delete id="delete">
+        delete
+        from inv_enterprise_registration
+        where org_id = #{orgId}
+          and id = #{id}
+    </delete>
+
+</mapper>

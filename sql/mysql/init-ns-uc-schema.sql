@@ -2,19 +2,6 @@ CREATE DATABASE IF NOT EXISTS ns_uc CHARACTER SET utf8mb4 COLLATE utf8mb4_genera
 
 use ns_uc;
 
-CREATE TABLE IF NOT EXISTS iam_api_key
-(
-    id          int          NOT NULL AUTO_INCREMENT,
-    org_id      int          NOT NULL COMMENT '机构id',
-    api_key     varchar(100) NOT NULL COMMENT 'appKey',
-    secret_key  varchar(255) NOT NULL COMMENT '秘钥',
-    remark      varchar(100) DEFAULT NULL COMMENT '备注',
-    expire_time datetime     DEFAULT NULL COMMENT '过期时间',
-    create_time datetime     NOT NULL COMMENT '创建时间',
-    PRIMARY KEY (id),
-    UNIQUE KEY uni_org_api_ley (org_id, api_key) USING BTREE
-);
-
 
 CREATE TABLE IF NOT EXISTS iam_app
 (
@@ -28,21 +15,6 @@ CREATE TABLE IF NOT EXISTS iam_app
     create_time datetime     DEFAULT NULL COMMENT '创建时间',
     PRIMARY KEY (id)
 ) COMMENT ='应用';
-
-
-CREATE TABLE IF NOT EXISTS iam_audit_log
-(
-    id          int          NOT NULL AUTO_INCREMENT,
-    org_id      int          NOT NULL COMMENT '机构id',
-    user_id     bigint       NOT NULL COMMENT '用户id',
-    biz_type    smallint     NOT NULL COMMENT '业务类型',
-    action      smallint     NOT NULL COMMENT '动作',
-    request     longtext     NOT NULL COMMENT '请求',
-    result      varchar(100) NOT NULL COMMENT '结果',
-    create_time datetime     NOT NULL COMMENT '操作时间',
-    PRIMARY KEY (id)
-) COMMENT ='审计日志表';
-
 
 CREATE TABLE IF NOT EXISTS iam_authorization
 (
@@ -71,23 +43,6 @@ CREATE TABLE IF NOT EXISTS iam_dm_region
     name varchar(20) NOT NULL COMMENT '行政区划名称',
     PRIMARY KEY (code)
 ) COMMENT ='行政区划';
-
-
-CREATE TABLE IF NOT EXISTS iam_email_template
-(
-    id          int          NOT NULL AUTO_INCREMENT,
-    name        varchar(100) NOT NULL COMMENT '模板名称',
-    status      smallint     NOT NULL COMMENT '模板状态 1 启用',
-    business    varchar(20)  NOT NULL COMMENT '业务标识',
-    description varchar(200) NOT NULL COMMENT '模板描述',
-    locale      varchar(20)  NOT NULL COMMENT '语言',
-    title       varchar(200) NOT NULL COMMENT '邮件标题',
-    content     longtext     NOT NULL COMMENT '邮件内容',
-    create_time datetime     NOT NULL COMMENT '创建时间',
-    update_time datetime     NOT NULL COMMENT '更新时间',
-    PRIMARY KEY (id)
-);
-
 
 CREATE TABLE IF NOT EXISTS iam_enterprise
 (
@@ -229,7 +184,6 @@ CREATE TABLE IF NOT EXISTS iam_resource
     create_time datetime     DEFAULT NULL COMMENT '创建时间',
     PRIMARY KEY (id)
 ) COMMENT ='资源';
-
 
 CREATE TABLE IF NOT EXISTS iam_role
 (

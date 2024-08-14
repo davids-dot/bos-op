@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.luoge.bos.op.invoice.common.dict.DictDao">
-    <select id="listByType" resultType="com.luoge.bos.op.invoice.model.common.dict.DictVO">
+<mapper namespace="com.luoge.bos.invoice.common.dict.DictDao">
+    <select id="listByType" resultType="com.luoge.bos.invoice.model.common.dict.DictVO">
         select code, value
         from sys_dict
         where type = #{type}

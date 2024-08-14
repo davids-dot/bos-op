@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.luoge.bos.op.invoice.park.distributor.ParkEnterpriseDistributorDao">
+<mapper namespace="com.luoge.bos.invoice.park.distributor.ParkEnterpriseDistributorDao">
 
     <sql id="cols">
         <trim>
@@ -10,7 +10,7 @@
         </trim>
     </sql>
 
-    <select id="list" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseDistributorDO">
+    <select id="list" resultType="com.luoge.bos.invoice.entity.ParkEnterpriseDistributorDO">
         select id, name, remark, status, create_time
         from inv_park_enterprise_distributor
         <where>
@@ -48,7 +48,7 @@
         where id = #{id}
     </update>
 
-    <select id="get" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseDistributorDO">
+    <select id="get" resultType="com.luoge.bos.invoice.entity.ParkEnterpriseDistributorDO">
         select id,
         name,
         remark,
@@ -69,19 +69,19 @@
         where name=#{name}
     </select>
 
-    <select id="getByName" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseDistributorDO">
+    <select id="getByName" resultType="com.luoge.bos.invoice.entity.ParkEnterpriseDistributorDO">
         select *
         from inv_park_enterprise_distributor
         where name = #{name}
     </select>
 
-    <select id="listAll" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseDistributorDO">
+    <select id="listAll" resultType="com.luoge.bos.invoice.entity.ParkEnterpriseDistributorDO">
         select
         <include refid="cols"/>
         from inv_park_enterprise_distributor
     </select>
 
-    <select id="listByStatus" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseDistributorDO">
+    <select id="listByStatus" resultType="com.luoge.bos.invoice.entity.ParkEnterpriseDistributorDO">
         select
         <include refid="cols"/>
         from inv_park_enterprise_distributor

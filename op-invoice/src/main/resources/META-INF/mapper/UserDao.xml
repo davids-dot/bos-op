@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.luoge.bos.op.invoice.org.UserDao">
+<mapper namespace="com.luoge.bos.invoice.org.UserDao">
     <sql id="cols">
         <trim>
             id, org_id, name, mobile, email, username, passwd, status, admin, create_time, update_time
         </trim>
     </sql>
 
-    <select id="getUser" resultType="com.luoge.bos.op.invoice.entity.uc.UserDO">
+    <select id="getUser" resultType="com.luoge.bos.invoice.entity.uc.UserDO">
         select
         <include refid="cols"/>
         from iam_user
@@ -45,21 +45,21 @@
         where username = #{username}
     </select>
 
-    <select id="getByName" resultType="com.luoge.bos.op.invoice.entity.uc.UserDO">
+    <select id="getByName" resultType="com.luoge.bos.invoice.entity.uc.UserDO">
         select
         <include refid="cols"/>
         from iam_user
         where username = #{username}
     </select>
 
-    <select id="getByMobile" resultType="com.luoge.bos.op.invoice.entity.uc.UserDO">
+    <select id="getByMobile" resultType="com.luoge.bos.invoice.entity.uc.UserDO">
         select
         <include refid="cols"/>
         from iam_user
         where mobile = #{mobile}
     </select>
 
-    <select id="getByEmail" resultType="com.luoge.bos.op.invoice.entity.uc.UserDO">
+    <select id="getByEmail" resultType="com.luoge.bos.invoice.entity.uc.UserDO">
         select
         <include refid="cols"/>
         from iam_user

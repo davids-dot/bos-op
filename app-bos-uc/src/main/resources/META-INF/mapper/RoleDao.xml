@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.luoge.bos.op.uc.dao.RoleDao">
+<mapper namespace="com.luoge.bos.uc.dao.RoleDao">
 
     <sql id="cols">
         <trim>
@@ -9,19 +9,19 @@
         </trim>
     </sql>
 
-    <select id="list" resultType="com.luoge.bos.op.uc.model.role.RoleVO">
+    <select id="list" resultType="com.luoge.bos.uc.model.role.RoleVO">
         SELECT id, name, remark
         FROM iam_role
         WHERE org_id = #{orgId}
         ORDER BY create_time desc
     </select>
 
-    <insert id="insert" parameterType="com.luoge.bos.op.uc.entity.RoleDO" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.luoge.bos.uc.entity.RoleDO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO iam_role(org_id, name, remark, create_time, update_time)
         VALUES (#{orgId}, #{name}, #{remark}, #{createTime}, #{updateTime})
     </insert>
 
-    <update id="update" parameterType="com.luoge.bos.op.uc.entity.RoleDO">
+    <update id="update" parameterType="com.luoge.bos.uc.entity.RoleDO">
         UPDATE iam_role
         SET name        = #{name},
             remark      = #{remark},
@@ -44,7 +44,7 @@
           AND role_id = #{roleId}
     </delete>
 
-    <select id="listRolePermissions" resultType="com.luoge.bos.op.uc.entity.RolePermissionDO">
+    <select id="listRolePermissions" resultType="com.luoge.bos.uc.entity.RolePermissionDO">
         SELECT target_id roleId, permission_code permissionCode
         FROM iam_authorization
         WHERE org_id = #{orgId}
@@ -55,7 +55,7 @@
         </foreach>
     </select>
 
-    <select id="getByName" resultType="com.luoge.bos.op.uc.entity.RoleDO">
+    <select id="getByName" resultType="com.luoge.bos.uc.entity.RoleDO">
         SELECT
         <include refid="cols"/>
         FROM iam_role

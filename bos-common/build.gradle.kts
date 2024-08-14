@@ -7,5 +7,6 @@ dependencies {
     // third
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.alibaba.fastjson2:fastjson2:2.0.41")
+    implementation("cn.hutool:hutool-all:5.8.22")
 }
 // gradle build -x test -b bos-common/build.gradle.kts

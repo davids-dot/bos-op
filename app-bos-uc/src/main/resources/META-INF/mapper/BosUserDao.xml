@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.luoge.bos.op.uc.dao.BosUserDao">
+<mapper namespace="com.luoge.bos.uc.dao.BosUserDao">
 
     <sql id="cols">
         <trim>
@@ -9,7 +9,7 @@
         </trim>
     </sql>
 
-    <select id="list" resultType="com.luoge.bos.op.uc.entity.UserDO">
+    <select id="list" resultType="com.luoge.bos.uc.entity.UserDO">
         SELECT
         <include refid="cols"/>
         FROM iam_user
@@ -19,14 +19,14 @@
         </if>
     </select>
 
-    <insert id="insert" parameterType="com.luoge.bos.op.uc.entity.UserDO">
+    <insert id="insert" parameterType="com.luoge.bos.uc.entity.UserDO">
         INSERT INTO iam_user(org_id, name, username, mobile, email, passwd,
                              avatar, status, remark, admin, create_time, update_time)
         VALUES (#{orgId}, #{name}, #{username}, #{mobile}, #{email}, #{passwd},
                 #{avatar}, 1, #{remark}, 0, #{createTime}, #{updateTime})
     </insert>
 
-    <update id="update" parameterType="com.luoge.bos.op.uc.entity.UserDO">
+    <update id="update" parameterType="com.luoge.bos.uc.entity.UserDO">
         UPDATE iam_user
         SET name        = #{name},
             mobile      = #{mobile},
@@ -66,20 +66,20 @@
         </foreach>
     </insert>
 
-    <select id="getByUsername" resultType="com.luoge.bos.op.uc.entity.UserDO">
+    <select id="getByUsername" resultType="com.luoge.bos.uc.entity.UserDO">
         SELECT
         <include refid="cols"/>
         FROM iam_user
         WHERE username = #{username}
     </select>
-    <select id="getByMobile" resultType="com.luoge.bos.op.uc.entity.UserDO">
+    <select id="getByMobile" resultType="com.luoge.bos.uc.entity.UserDO">
         SELECT
         <include refid="cols"/>
         FROM iam_user
         WHERE mobile = #{mobile}
     </select>
 
-    <select id="getByEmail" resultType="com.luoge.bos.op.uc.entity.UserDO">
+    <select id="getByEmail" resultType="com.luoge.bos.uc.entity.UserDO">
         SELECT
         <include refid="cols"/>
         FROM iam_user
@@ -105,7 +105,7 @@
             </foreach>
         </if>
     </select>
-    <select id="get" resultType="com.luoge.bos.op.uc.entity.UserDO">
+    <select id="get" resultType="com.luoge.bos.uc.entity.UserDO">
         SELECT
         <include refid="cols"/>
         FROM iam_user
@@ -113,7 +113,7 @@
         AND org_id = #{orgId}
     </select>
 
-    <select id="getById" resultType="com.luoge.bos.op.uc.entity.UserDO">
+    <select id="getById" resultType="com.luoge.bos.uc.entity.UserDO">
         SELECT
         <include refid="cols"/>
         FROM iam_user

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.luoge.bos.op.invoice.org.OrgDao">
+<mapper namespace="com.luoge.bos.invoice.org.OrgDao">
     <sql id="cols">
         <trim>
             id,name,remark,create_time
         </trim>
     </sql>
 
-    <select id="listByPage" resultType="com.luoge.bos.op.invoice.entity.uc.OrgDO">
+    <select id="listByPage" resultType="com.luoge.bos.invoice.entity.uc.OrgDO">
         select id,name,remark,create_time
         from iam_org
         <where>
@@ -18,7 +18,7 @@
         order by create_time desc
     </select>
 
-    <select id="getOrg" resultType="com.luoge.bos.op.invoice.entity.uc.OrgDO">
+    <select id="getOrg" resultType="com.luoge.bos.invoice.entity.uc.OrgDO">
         select id, name, remark
         from iam_org
         where id = #{id}
@@ -50,14 +50,14 @@
         where id = #{id}
     </update>
 
-    <select id="getByName" resultType="com.luoge.bos.op.invoice.entity.uc.OrgDO">
+    <select id="getByName" resultType="com.luoge.bos.invoice.entity.uc.OrgDO">
         select
         <include refid="cols"/>
         from iam_org
         where name = #{name}
     </select>
 
-    <select id="listAll" resultType="com.luoge.bos.op.invoice.entity.uc.OrgDO">
+    <select id="listAll" resultType="com.luoge.bos.invoice.entity.uc.OrgDO">
         select
         <include refid="cols"/>
         from iam_org

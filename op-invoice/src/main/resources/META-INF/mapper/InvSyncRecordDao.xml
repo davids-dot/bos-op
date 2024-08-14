@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.luoge.bos.op.invoice.collect.schedule.InvSyncRecordDao">
+<mapper namespace="com.luoge.bos.invoice.collect.schedule.InvSyncRecordDao">
 
-    <insert id="insert" parameterType="com.luoge.bos.op.invoice.entity.InvSyncRecordDO">
+    <insert id="insert" parameterType="com.luoge.bos.invoice.entity.InvSyncRecordDO">
         insert into inv_sync_record (last_sync_time, update_time)
         values (#{lastSyncTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
     </insert>
@@ -14,7 +14,7 @@
         where id = 1
     </update>
 
-    <select id="getSyncRecord" resultType="com.luoge.bos.op.invoice.entity.InvSyncRecordDO">
+    <select id="getSyncRecord" resultType="com.luoge.bos.invoice.entity.InvSyncRecordDO">
         select last_sync_time, update_time
         from inv_sync_record
         where id = 1

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.luoge.bos.op.invoice.collect.manual.InvoiceDao">
+<mapper namespace="com.luoge.bos.invoice.collect.manual.InvoiceDao">
 
     <sql id="cols">
         <trim>
@@ -66,7 +66,7 @@
 
 
     <select id="summaryInvoiceAmountFee"
-            resultType="com.luoge.bos.op.invoice.model.query.EnterpriseInvoiceSummaryBO">
+            resultType="com.luoge.bos.invoice.model.query.EnterpriseInvoiceSummaryBO">
         select sum(total)       total,
                sum(service_fee) service_fee
         from inv_invoice
@@ -76,7 +76,7 @@
           and #{endTime} > issue_time
     </select>
 
-    <select id="summaryMonthFee" resultType="com.luoge.bos.op.invoice.model.report.ParkEnterpriseReportBO">
+    <select id="summaryMonthFee" resultType="com.luoge.bos.invoice.model.report.ParkEnterpriseReportBO">
         select enterprise_id,
                DATE_FORMAT(issue_time, '%Y-%m-01 00:00:00')       month,
                sum(total)                                         invoice_total,
@@ -112,7 +112,7 @@
           and #{endTime} > issue_time
     </select>
 
-    <select id="listManualInvoice" resultType="com.luoge.bos.op.invoice.model.collect.InvoiceBO">
+    <select id="listManualInvoice" resultType="com.luoge.bos.invoice.model.collect.InvoiceBO">
         SELECT
         a.id,
         a.park_provider_name,
@@ -143,14 +143,14 @@
         order by issue_time desc
     </select>
 
-    <select id="getDetail" resultType="com.luoge.bos.op.invoice.entity.InvoiceDO">
+    <select id="getDetail" resultType="com.luoge.bos.invoice.entity.InvoiceDO">
         select
         <include refid="cols"/>
         from inv_invoice
         where id = #{id}
     </select>
 
-    <select id="listEnterpriseInvoicesByPage" resultType="com.luoge.bos.op.invoice.entity.InvoiceDO">
+    <select id="listEnterpriseInvoicesByPage" resultType="com.luoge.bos.invoice.entity.InvoiceDO">
         select
         <include refid="cols"/>
         from inv_invoice
@@ -161,7 +161,7 @@
     </select>
 
 
-    <select id="sumEnterpriseFee" resultType="com.luoge.bos.op.invoice.model.query.EnterpriseFeeBO">
+    <select id="sumEnterpriseFee" resultType="com.luoge.bos.invoice.model.query.EnterpriseFeeBO">
         select
         i.park_enterprise_id enterprise_id,
         sum(COALESCE(i.total,0)) total_amount,
@@ -188,7 +188,7 @@
     </select>
 
 
-    <select id="listEnterpriseForFee" resultType="com.luoge.bos.op.invoice.model.query.EnterpriseFeeBO">
+    <select id="listEnterpriseForFee" resultType="com.luoge.bos.invoice.model.query.EnterpriseFeeBO">
         select
         e.enterprise_id,
         e.enterprise_name,
@@ -227,7 +227,7 @@
     </select>
 
     <select id="summaryEnterpriseFee"
-            resultType="com.luoge.bos.op.invoice.model.query.EnterpriseInvoiceSummaryBO">
+            resultType="com.luoge.bos.invoice.model.query.EnterpriseInvoiceSummaryBO">
         select
         sum(COALESCE(i.total,0)) total,
         sum(COALESCE(i.service_fee,0)) service_fee,
@@ -251,7 +251,7 @@
         </where>
     </select>
 
-    <select id="listEnterpriseInvoices" resultType="com.luoge.bos.op.invoice.entity.InvoiceDO">
+    <select id="listEnterpriseInvoices" resultType="com.luoge.bos.invoice.entity.InvoiceDO">
         select
         <include refid="cols"/>
         from inv_invoice
@@ -263,7 +263,7 @@
 
 
     <select id="summaryEnterpriseReport"
-            resultType="com.luoge.bos.op.invoice.model.query.EnterpriseInvoiceSummaryBO">
+            resultType="com.luoge.bos.invoice.model.query.EnterpriseInvoiceSummaryBO">
         select
         sum(total) total,
         sum(service_fee) service_fee
@@ -281,7 +281,7 @@
         </where>
     </select>
 
-    <select id="summaryHistoryTax" resultType="com.luoge.bos.op.invoice.model.collect.SummaryHistoryTaxBO">
+    <select id="summaryHistoryTax" resultType="com.luoge.bos.invoice.model.collect.SummaryHistoryTaxBO">
         select enterprise_id,
                sum(case when type = 81 then total_tax else 0 end) special_tax,
                sum(case when type = 82 then total_tax else 0 end) normal_tax,
@@ -295,7 +295,7 @@
         group by enterprise_id
     </select>
 
-    <select id="summarySeasonDaily" resultType="com.luoge.bos.op.invoice.model.collect.SeasonSummaryDailyBO">
+    <select id="summarySeasonDaily" resultType="com.luoge.bos.invoice.model.collect.SeasonSummaryDailyBO">
         select enterprise_id,
                sum(total)                                         invoice_total,
                sum(total_amount)                                  invoice_total_amount,
@@ -316,7 +316,7 @@
         group by enterprise_id
     </select>
 
-    <select id="summaryYearDaily" resultType="com.luoge.bos.op.invoice.model.collect.YearSummaryDailyBO">
+    <select id="summaryYearDaily" resultType="com.luoge.bos.invoice.model.collect.YearSummaryDailyBO">
         select enterprise_id,
                coalesce(
                        sum(case
@@ -334,7 +334,7 @@
         group by enterprise_id
     </select>
 
-    <select id="listTodayInvoices" resultType="com.luoge.bos.op.invoice.entity.InvoiceDO">
+    <select id="listTodayInvoices" resultType="com.luoge.bos.invoice.entity.InvoiceDO">
         select
         <include refid="cols"/>
         from inv_invoice

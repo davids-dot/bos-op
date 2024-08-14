@@ -13,6 +13,7 @@ dependencies {
     implementation("com.luoge.ns:uc-api:1.1.0-SNAPSHOT")
     implementation(project(":op-invoice"))
     implementation(project(":app-bos-uc"))
+    implementation(project(":app-invoice"))
     implementation(project(":op-gateway"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")

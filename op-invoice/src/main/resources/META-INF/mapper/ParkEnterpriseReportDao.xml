@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.luoge.bos.op.invoice.report.enterprise.ParkEnterpriseReportDao">
+<mapper namespace="com.luoge.bos.invoice.report.enterprise.ParkEnterpriseReportDao">
 
     <sql id="cols">
         <trim>
@@ -67,7 +67,7 @@
         update_time = values(update_time)
     </insert>
 
-    <select id="summaryHistory" resultType="com.luoge.bos.op.invoice.model.collect.SummaryHistoryBO">
+    <select id="summaryHistory" resultType="com.luoge.bos.invoice.model.collect.SummaryHistoryBO">
         select
         sum(invoice_total) invoice_total,
         sum(invoice_total_amount) invoice_total_amount,
@@ -94,7 +94,7 @@
         </foreach>
     </select>
 
-    <select id="listProviderMonthReportDetailByPage" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+    <select id="listProviderMonthReportDetailByPage" resultType="com.luoge.bos.invoice.entity.ParkEnterpriseReportDO">
         select
         <include refid="cols"/>
         from inv_report_month_park_enterprise
@@ -103,7 +103,7 @@
         order by enterprise_id
     </select>
 
-    <select id="listProviderMonthReportDetail" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+    <select id="listProviderMonthReportDetail" resultType="com.luoge.bos.invoice.entity.ParkEnterpriseReportDO">
         select
         <include refid="cols"/>
         from inv_report_month_park_enterprise
@@ -113,7 +113,7 @@
     </select>
 
     <select id="listDistributorMonthReportDetailByPage"
-            resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+            resultType="com.luoge.bos.invoice.entity.ParkEnterpriseReportDO">
         select
         <include refid="cols"/>
         from inv_report_month_park_enterprise
@@ -123,7 +123,7 @@
     </select>
 
     <select id="listDistributorMonthReportDetail"
-            resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+            resultType="com.luoge.bos.invoice.entity.ParkEnterpriseReportDO">
         select
         <include refid="cols"/>
         from inv_report_month_park_enterprise
@@ -158,7 +158,7 @@
         </where>
     </sql>
 
-    <select id="listEnterpriseReportByPage" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+    <select id="listEnterpriseReportByPage" resultType="com.luoge.bos.invoice.entity.ParkEnterpriseReportDO">
         select
         <include refid="cols"/>
         from inv_report_month_park_enterprise
@@ -166,7 +166,7 @@
         order by enterprise_id, month
     </select>
 
-    <select id="listEnterpriseReport" resultType="com.luoge.bos.op.invoice.entity.ParkEnterpriseReportDO">
+    <select id="listEnterpriseReport" resultType="com.luoge.bos.invoice.entity.ParkEnterpriseReportDO">
         select
         <include refid="cols"/>
         from inv_report_month_park_enterprise
@@ -175,7 +175,7 @@
     </select>
 
     <select id="summaryEnterpriseReport"
-            resultType="com.luoge.bos.op.invoice.model.report.SummaryEnterpriseReportBO">
+            resultType="com.luoge.bos.invoice.model.report.SummaryEnterpriseReportBO">
         select
         sum(invoice_total) total,
         sum(service_fee) service_fee,
@@ -185,7 +185,7 @@
         <include refid="listCondition"/>
     </select>
 
-    <select id="listParkProvidersReports" resultType="com.luoge.bos.op.invoice.entity.ParkProviderReportDO">
+    <select id="listParkProvidersReports" resultType="com.luoge.bos.invoice.entity.ParkProviderReportDO">
         select
             park_provider_id,
             park_provider_name,
@@ -206,7 +206,7 @@
         group by park_provider_id, park_provider_name, month
     </select>
 
-    <select id="listDistributorsReports" resultType="com.luoge.bos.op.invoice.entity.DistributorReportDO">
+    <select id="listDistributorsReports" resultType="com.luoge.bos.invoice.entity.DistributorReportDO">
         select
         park_enterprise_distributor_id,
         park_enterprise_distributor_name,

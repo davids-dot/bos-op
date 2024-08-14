@@ -56,14 +56,8 @@ INSERT INTO `iam_menu` (`id`, `app_id`, `name`, `url`, `parent_id`, `seq`, `crea
 VALUES (30, 1, '查询统计', NULL, 0, 30, '2024-03-05 21:08:44');
 INSERT INTO `iam_menu` (`id`, `app_id`, `name`, `url`, `parent_id`, `seq`, `create_time`)
 VALUES (31, 1, '企业服务费查询', '/bos-op/enterprise-fee/', 30, 31, '2024-03-05 21:08:44');
-INSERT INTO `iam_menu` (`id`, `app_id`, `name`, `url`, `parent_id`, `seq`, `create_time`)
-VALUES (32, 1, '园区企业月报', '/bos-op/report-enterprise/', 30, 32, '2024-03-05 21:08:44');
-INSERT INTO `iam_menu` (`id`, `app_id`, `name`, `url`, `parent_id`, `seq`, `create_time`)
-VALUES (33, 1, '园区服务商月报', '/bos-op/report-provider/', 30, 33, '2024-03-05 21:08:44');
-INSERT INTO `iam_menu` (`id`, `app_id`, `name`, `url`, `parent_id`, `seq`, `create_time`)
-VALUES (34, 1, '渠道商月报', '/bos-op/report-distributor/', 30, 34, '2024-03-05 21:08:44');
-INSERT INTO `iam_menu` (`id`, `app_id`, `name`, `url`, `parent_id`, `seq`, `create_time`)
-VALUES (97, 1, '开票申请', '/bos-op/invoice-apply/', 10, 97, '2024-03-19 11:45:44');
+
+
 INSERT INTO `iam_menu` (`id`, `app_id`, `name`, `url`, `parent_id`, `seq`, `create_time`)
 VALUES (98, 1, '工商注册', '/bos-op/enterprise-registration/', 10, 98, '2024-03-05 21:08:44');
 INSERT INTO `iam_menu` (`id`, `app_id`, `name`, `url`, `parent_id`, `seq`, `create_time`)

@@ -15,19 +15,6 @@ CREATE TABLE IF NOT EXISTS iam_app
     PRIMARY KEY (id)
 ) COMMENT ='应用';
 
-CREATE TABLE IF NOT EXISTS iam_audit_log
-(
-    id          int                                     NOT NULL AUTO_INCREMENT,
-    org_id      int                                     NOT NULL COMMENT '机构id',
-    user_id     bigint                                  NOT NULL COMMENT '用户id',
-    biz_type    smallint                                NOT NULL COMMENT '业务类型',
-    action      smallint                                NOT NULL COMMENT '动作',
-    request     longtext COLLATE utf8mb4_general_ci     NOT NULL COMMENT '请求',
-    result      varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '结果',
-    create_time datetime                                NOT NULL COMMENT '操作时间',
-    PRIMARY KEY (id)
-) COMMENT ='审计日志表';
-
 
 CREATE TABLE IF NOT EXISTS iam_authorization
 (

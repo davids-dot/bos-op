@@ -9,6 +9,7 @@ tasks.test {
 dependencies {
     api(project(":op-core"))
     implementation(project(":bos-common"))
+    implementation(project(":app-data"))
     implementation("com.luoge.ns:uc-api:1.1.0-SNAPSHOT")
     implementation("com.luoge.bos:uc-context:1.0-SNAPSHOT")
     implementation("com.luoge.bos:uc-api:1.0-SNAPSHOT")

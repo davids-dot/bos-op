@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api(project(":op-core"))
+    implementation(project(":app-data"))
 
     // Second-party packages
     implementation("com.luoge.ns:base-core:1.0-SNAPSHOT")

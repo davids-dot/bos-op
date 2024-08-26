@@ -1,12 +1,12 @@
 package com.luoge.bos.uc.service;
 
-import com.luoge.bos.uc.dao.PermissionDao;
-import com.luoge.bos.uc.entity.MenuDO;
+import com.luoge.bos.data.MenuDao;
+import com.luoge.bos.data.PermissionDao;
+import com.luoge.bos.data.entity.MenuDO;
 import com.luoge.bos.uc.model.MenuBO;
-import com.luoge.bos.uc.model.permission.PermissionMenuBO;
-import com.luoge.bos.uc.model.permission.PermissionResourceBO;
+import com.luoge.bos.data.model.PermissionMenuBO;
+import com.luoge.bos.data.model.PermissionResourceBO;
 import com.luoge.bos.uc.core.Constants;
-import com.luoge.bos.uc.dao.MenuDao;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;

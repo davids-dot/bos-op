@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.luoge.bos.uc.dao.MenuDao">
-    <select id="list" resultType="com.luoge.bos.uc.entity.MenuDO">
-        SELECT id, app_id, name, url, parent_id, seq
-        FROM iam_menu
-    </select>
-</mapper>

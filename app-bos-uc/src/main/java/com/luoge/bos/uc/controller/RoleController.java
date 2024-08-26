@@ -1,6 +1,7 @@
 package com.luoge.bos.uc.controller;
 
-import com.luoge.bos.uc.model.permission.PermissionVO;
+import com.luoge.bos.data.model.PermissionVO;
+import com.luoge.bos.data.model.RoleVO;
 import com.luoge.bos.uc.model.role.*;
 import com.luoge.bos.uc.service.RoleService;
 import com.luoge.bos.uc.ctx.Context;

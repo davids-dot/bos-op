@@ -14,7 +14,9 @@ dependencies {
     implementation(project(":op-invoice"))
     implementation(project(":app-bos-uc"))
     implementation(project(":app-invoice"))
+    implementation(project(":app-uc"))
     implementation(project(":op-gateway"))
+
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")

@@ -6,5 +6,8 @@ include("op-gateway")
 include("bos-common")
 include("app-invoice")
 include("app-bos-uc")
-
-
+include("app-uc")
+include("app-data")
+include("base-core")
+include("uc-api")
+include("uc-context")

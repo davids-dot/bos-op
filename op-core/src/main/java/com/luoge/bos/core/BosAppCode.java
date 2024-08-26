@@ -23,4 +23,5 @@ public interface BosAppCode {
     int ENTERPRISE_REG_AUDITED = 13109;
     int INVOICE_APPLY_AUDITED = 13110;
 
+    int WRONG_PHONE_NUMBER = 10128;
 }

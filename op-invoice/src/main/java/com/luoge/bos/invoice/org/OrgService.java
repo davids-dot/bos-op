@@ -1,17 +1,19 @@
 package com.luoge.bos.invoice.org;
 
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
-import com.luoge.bos.invoice.model.org.EnterpriseCountBO;
-import com.luoge.bos.invoice.model.org.OrgBO;
-import com.luoge.bos.invoice.model.org.OrgDetailBO;
-import com.luoge.bos.invoice.org.enterprise.EnterpriseDao;
-import com.luoge.bos.invoice.util.ParamValidator;
 import com.luoge.bos.core.BosAppCode;
 import com.luoge.bos.core.model.PageQuery;
 import com.luoge.bos.core.utils.DateUtil;
 import com.luoge.bos.core.utils.EncryptUtil;
-import com.luoge.bos.invoice.entity.uc.OrgDO;
-import com.luoge.bos.invoice.entity.uc.UserDO;
+import com.luoge.bos.data.OrgDao;
+import com.luoge.bos.data.UserDao;
+import com.luoge.bos.data.entity.OrgDO;
+import com.luoge.bos.data.entity.UserDO;
+import com.luoge.bos.data.model.EnterpriseCountBO;
+import com.luoge.bos.invoice.model.org.OrgBO;
+import com.luoge.bos.invoice.model.org.OrgDetailBO;
+import com.luoge.bos.data.EnterpriseDao;
+import com.luoge.bos.invoice.util.ParamValidator;
 import com.luoge.ns.core.Page;
 import com.luoge.ns.core.R;
 import jakarta.annotation.Resource;
@@ -156,7 +158,7 @@ public class OrgService {
                 .setUsername(orgDetailBO.getAdminAccount())
                 .setPasswd(StringUtils.isBlank(orgDetailBO.getAdminPassword()) ? StringUtils.EMPTY : EncryptUtil.crypt(orgDetailBO.getAdminPassword()))
                 .setStatus(1)
-                .setAdmin(1)
+                .setAdmin(true)
                 .setCreateTime(now)
                 .setUpdateTime(now);
     }

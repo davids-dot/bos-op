@@ -4,24 +4,20 @@ import com.alicp.jetcache.anno.CacheInvalidate;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CacheUpdate;
 import com.alicp.jetcache.anno.Cached;
+import com.luoge.app.uc.core.Constants;
+import com.luoge.app.uc.model.User;
 import com.luoge.app.uc.model.VerificationCodeBO;
-import com.luoge.ns.uc.core.Constants;
-import com.luoge.ns.uc.model.ApiKey;
-import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 public class CacheService {
     private static final Logger logger = LoggerFactory.getLogger(CacheService.class);
 
-//    @Resource
+    //    @Resource
 //    private PermissionDao permissionDao;
 //    @Resource
 //    private ApiKeyService apiKeyService;
@@ -86,4 +82,19 @@ public class CacheService {
     public void invalidateApiKey(int orgId, String apiKey) {
     }
 
+
+    @CacheUpdate(name = Constants.CACHE_USER, key = "#userId", value = "#user")
+    public void setUser(int userId, User user) {
+        logger.debug("更新用户登录缓存.");
+    }
+
+
+    @CacheUpdate(name = Constants.CACHE_VERIFICATION_CODE, key = "#mobile", value = "#code")
+    public void setVerificationCode(String mobile, VerificationCodeBO code) {
+    }
+
+    @Cached(name = com.luoge.ns.uc.core.Constants.CACHE_USER, key = "#userId", expire = com.luoge.ns.uc.core.Constants.CACHE_USER_EXPIRE_HOURS, timeUnit = TimeUnit.HOURS, cacheType = CacheType.REMOTE)
+    public User getUser(int userId) {
+        return null;
+    }
 }

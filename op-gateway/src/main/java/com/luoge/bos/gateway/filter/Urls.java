@@ -8,7 +8,7 @@ import java.util.Set;
 public class Urls {
 
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
-    private static final Set<String> EXCLUDE_URLS = Set.of("/bos-uc/common/**");
+    private static final Set<String> EXCLUDE_URLS = Set.of("/bos-uc/common/**","/uc/public/**");
     private static final Set<String> NOT_AUTHENTICATION_URLS = Set.of("/bos-uc/auth/**", "/mobile/invoice/**");
 
 

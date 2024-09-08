@@ -3,24 +3,28 @@ package com.luoge.app.uc.wx;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.binarywang.wx.miniapp.util.WxMaConfigHolder;
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.crypto.digest.DigestAlgorithm;
-import cn.hutool.crypto.digest.Digester;
-import com.alibaba.fastjson2.JSONObject;
 import com.luoge.app.uc.auth.AuthnService;
 import com.luoge.app.uc.auth.CacheService;
+import com.luoge.app.uc.core.ThirdUserType;
+import com.luoge.app.uc.core.UserStatus;
 import com.luoge.app.uc.model.LoginByCodeBO;
+import com.luoge.app.uc.model.LoginByMobileAndCodeBO;
 import com.luoge.app.uc.model.LoginResultBO;
+import com.luoge.app.uc.model.WxUserBindStatus;
+import com.luoge.app.uc.service.UserService;
+import com.luoge.bos.core.BosAppCode;
 import com.luoge.bos.core.utils.DateUtil;
+import com.luoge.bos.data.OrgDao;
+import com.luoge.bos.data.ThirdUserDao;
+import com.luoge.bos.data.UserDao;
+import com.luoge.bos.data.entity.OrgDO;
+import com.luoge.bos.data.entity.ThirdUserDO;
+import com.luoge.bos.data.entity.UserDO;
+import com.luoge.bos.uc.core.UCCode;
 import com.luoge.ns.core.Code;
 import com.luoge.ns.core.R;
-import com.luoge.ns.uc.core.UCCode;
 import jakarta.annotation.Resource;
 import me.chanjar.weixin.common.error.WxErrorException;
-import me.chanjar.weixin.mp.api.WxMpService;
-import me.chanjar.weixin.mp.bean.result.WxMpUser;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -38,22 +42,20 @@ public class WxUserService {
     @Resource
     private WxMaService wxMaService;
     @Resource
-    private WxMpService wxMpService;
-//    @Resource
-//    private ThirdUserDao thirdUserDao;
-//    @Resource
-//    private UserService userService;
-//    @Lazy
-//    @Resource
-//    private AuthnService authnService;
-//    @Resource
-//    private CacheService cacheService;
-//    @Resource
-//    private UserDao userDao;
-//
-//    @Resource
-//    private OrgDao orgDao;
-//
+    private CacheService cacheService;
+    @Resource
+    private ThirdUserDao thirdUserDao;
+    @Resource
+    private UserService userService;
+    @Lazy
+    @Resource
+    private AuthnService authnService;
+    @Resource
+    private UserDao userDao;
+    @Resource
+    private OrgDao orgDao;
+
+    //
 //    @Resource
 //    private WxConfig wxConfig;
 //
@@ -119,10 +121,11 @@ public class WxUserService {
 //        }
 //    }
 //
-//    private void updateUserIdByUnionId(int userId, String unionId) {
-//        thirdUserDao.updateUserIdByUnionId(userId, unionId);
-//    }
-//
+    private void updateUserIdByUnionId(int userId, String unionId) {
+        thirdUserDao.updateUserIdByUnionId(userId, unionId);
+    }
+
+    //
 //    /**
 //     * 获取用户绑定的 unionId
 //     */
@@ -151,127 +154,161 @@ public class WxUserService {
 //    }
 //
 //
-//    @Transactional
-//    public R<LoginResultBO> loginAndBindMiniAppByPhone(LoginByMobileAndCodeBO loginByPhoneBO, String appId) {
-//        if (!wxMaService.switchover(appId)) {
-//            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appId));
-//        }
-//        try {
-//            WxMaJscode2SessionResult sessionInfo = wxMaService.getUserService().getSessionInfo(loginByPhoneBO.getCode());
-//            if (Objects.isNull(sessionInfo)) {
-//                return R.fail(UCCode.WX_CODE_NOT_VALID);
-//            }
-//            String openId = sessionInfo.getOpenid();
-//            String unionId = sessionInfo.getUnionid();
+    @Transactional
+    public R<LoginResultBO> loginAndBindMiniAppByPhone(LoginByMobileAndCodeBO loginByPhoneBO, String appId) {
+        if (!wxMaService.switchover(appId)) {
+            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appId));
+        }
+        try {
+            WxMaJscode2SessionResult sessionInfo = wxMaService.getUserService().getSessionInfo(loginByPhoneBO.getCode());
+            if (Objects.isNull(sessionInfo)) {
+                return R.fail(BosAppCode.WX_CODE_NOT_VALID);
+            }
+            String openId = sessionInfo.getOpenid();
+            String unionId = sessionInfo.getUnionid();
+
+            // 校验验证码正确
+            var processingVerifyCode = cacheService.getVerificationCode(loginByPhoneBO.getMobile());
+            if (Objects.isNull(processingVerifyCode)) {
+                return R.fail(BosAppCode.VERIFICATION_CODE_EXPIRED);
+            }
+
+            if (!Objects.equals(processingVerifyCode.getVerificationCode(), loginByPhoneBO.getVerifyCode())) {
+                return R.fail(BosAppCode.WRONG_VERIFICATION_CODE);
+            }
+
+            // 是系统用户
+            UserDO userDO = userDao.getByMobile(loginByPhoneBO.getMobile());
+            if (Objects.nonNull(userDO)) {
+                return checkAndLoginForSysUser(userDO.getId(), openId, unionId, appId, userDO);
+            }
+            // 手机号
+            UserDO newUser = registerNewUser(loginByPhoneBO.getMobile(), openId, unionId, appId);
+            // 如果手机号 不是系统用户
+            return authnService.signIn(newUser);
+        } catch (WxErrorException e) {
+            logger.error(e.getMessage(), e);
+            return R.fail(BosAppCode.WX_BUSINESS_ERROR, e.getError().getErrorMsg());
+        } finally {
+            WxMaConfigHolder.remove();//清理ThreadLocal
+        }
+    }
+
+    /**
+     * 绑定后的用户在小程序上直接登录
+     */
+    public R<LoginResultBO> loginMiniApp(LoginByCodeBO loginByCodeBO, String appId) {
+        if (!wxMaService.switchover(appId)) {
+            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appId));
+        }
+        try {
+            WxMaJscode2SessionResult sessionInfo = wxMaService.getUserService().getSessionInfo(loginByCodeBO.getCode());
+            if (Objects.isNull(sessionInfo)) {
+                return R.fail(BosAppCode.WX_CODE_NOT_VALID);
+            }
+            String openid = sessionInfo.getOpenid();
+            ThirdUserDO thirdUser = thirdUserDao.getByOpenId(openid, ThirdUserType.WX_MINI_APP_USER.type,
+                    appId);
+            if (Objects.isNull(thirdUser) || Objects.isNull(thirdUser.getUserId())) {
+                return R.fail(UCCode.WX_USER_NOT_BIND);
+            }
+            UserDO userDO = userService.get(thirdUser.getUserId());
+            if (Objects.isNull(userDO)) {
+                return R.fail(UCCode.WX_USER_NOT_BIND);
+            }
+
+            return authnService.signIn(userDO);
+        } catch (WxErrorException e) {
+            logger.error(e.getMessage(), e);
+            return R.fail(UCCode.WX_BUSINESS_ERROR, e.getError().getErrorMsg());
+        } finally {
+            WxMaConfigHolder.remove();//清理ThreadLocal
+        }
+    }
+
+
+    private R<LoginResultBO> checkAndLoginForSysUser(Integer userId, String openId, String unionId, String appId, UserDO userDO) {
+        WxUserBindStatus wxUserBindStatus = checkUserBindStatus(userId, openId, appId);
+        switch (wxUserBindStatus) {
+            case SYS_USER_HAS_BIND_OTHER -> {
+                return R.fail(BosAppCode.WX_SYS_USER_HAS_BIND_OTHER);
+            }
+            case WX_USER_HAS_BIND_OTHER -> {
+                return R.fail(BosAppCode.WX_USER_HAS_BIND_OTHER);
+            }
+            case NOT_BIND_WX_USER -> {
+                return signInAndBind(userDO, unionId, openId, appId);
+            }
+            case HAS_BIND -> {
+                return authnService.signIn(userDO);
+            }
+        }
+        return R.fail(Code.SYSTEM_ERROR);
+    }
+
+    //
+    private R<LoginResultBO> signInAndBind(UserDO userDO, String unionId, String openId, String appId) {
+        R<LoginResultBO> r = authnService.signIn(userDO);
+        if (r.ok()) {
+            int userId = r.getData().getUserId();
+            saveMiniAppBindId(userId, openId, unionId, userDO.getStatus(), appId);
+            updateUserIdByUnionId(userId, unionId);
+        }
+        return r;
+    }
 //
-//            // 校验验证码正确
-//            var processingVerifyCode = cacheService.getVerificationCode(loginByPhoneBO.getMobile());
-//            if (Objects.isNull(processingVerifyCode)) {
-//                return R.fail(UCCode.VERIFICATION_CODE_EXPIRED);
-//            }
-//
-//            if (!Objects.equals(processingVerifyCode.getVerificationCode(), loginByPhoneBO.getVerifyCode())) {
-//                return R.fail(UCCode.WRONG_VERIFICATION_CODE);
-//            }
-//
-//            // 是系统用户
-//            UserDO userDO = userDao.getByMobile(loginByPhoneBO.getMobile());
-//            if (Objects.nonNull(userDO)) {
-//                return checkAndLoginForSysUser(userDO.getId(), openId, unionId, appId, userDO);
-//            }
-//            // 手机号
-//            UserDO newUser = registerNewUser(loginByPhoneBO.getMobile(), openId, unionId, appId);
-//            // 如果手机号 不是系统用户
-//            return authnService.signIn(newUser);
-//        } catch (WxErrorException e) {
-//            logger.error(e.getMessage(), e);
-//            return R.fail(UCCode.WX_BUSINESS_ERROR, e.getError().getErrorMsg());
-//        } finally {
-//            WxMaConfigHolder.remove();//清理ThreadLocal
-//        }
-//    }
-//
-//
-//    private R<LoginResultBO> checkAndLoginForSysUser(Integer userId, String openId, String unionId, String appId, UserDO userDO) {
-//        WxUserBindStatus wxUserBindStatus = checkUserBindStatus(userId, openId, appId);
-//        switch (wxUserBindStatus) {
-//            case SYS_USER_HAS_BIND_OTHER -> {
-//                return R.fail(UCCode.WX_SYS_USER_HAS_BIND_OTHER);
-//            }
-//            case WX_USER_HAS_BIND_OTHER -> {
-//                return R.fail(UCCode.WX_USER_HAS_BIND_OTHER);
-//            }
-//            case NOT_BIND_WX_USER -> {
-//                return signInAndBind(userDO, unionId, openId, appId);
-//            }
-//            case HAS_BIND -> {
-//                return authnService.signIn(userDO);
-//            }
-//        }
-//        return R.fail(Code.SYSTEM_ERROR);
-//    }
-//
-//    private R<LoginResultBO> signInAndBind(UserDO userDO, String unionId, String openId, String appId) {
-//        R<LoginResultBO> r = authnService.signIn(userDO);
-//        if (r.ok()) {
-//            int userId = r.getData().getUserId();
-//            saveMiniAppBindId(userId, openId, unionId, userDO.getStatus(), appId);
-//            updateUserIdByUnionId(userId, unionId);
-//        }
-//        return r;
-//    }
-//
-//    /**
-//     * 检查微信用户绑定状态
-//     */
-//    private WxUserBindStatus checkUserBindStatus(Integer userId, String miniAppOpenId, String appId) {
-//        ThirdUserDO existBindUser = thirdUserDao.getByUserId(userId, ThirdUserType.WX_MINI_APP_USER.type, appId);
-//
-//        // 系统用户已绑定微信账号
-//        if (Objects.nonNull(existBindUser)) {
-//            if (!Objects.equals(existBindUser.getOpenId(), miniAppOpenId)) {
-//                return WxUserBindStatus.SYS_USER_HAS_BIND_OTHER;
-//            }
-//            return WxUserBindStatus.HAS_BIND;
-//        }
-//
-//        // 微信账号已绑定用户
-//        existBindUser = thirdUserDao.getByOpenId(miniAppOpenId, ThirdUserType.WX_MINI_APP_USER.type, appId);
-//        if (Objects.nonNull(existBindUser)) {
-//            if (!Objects.equals(existBindUser.getUserId().intValue(), userId)) {
-//                return WxUserBindStatus.WX_USER_HAS_BIND_OTHER;
-//            }
-//            return WxUserBindStatus.HAS_BIND;
-//        }
-//        return WxUserBindStatus.NOT_BIND_WX_USER;
-//    }
-//
-//
-//    public UserDO registerNewUser(String phoneNumber, String openId, String unionId, String appId) {
-//        LocalDateTime now = DateUtil.nowTime();
-//        OrgDO newOrg = new OrgDO()
-//                .setName(phoneNumber)
-//                .setRemark("用户注册自动创建的机构")
-//                .setCreateTime(now)
-//                .setUpdateTime(now);
-//        orgDao.insert(newOrg);
-//
-//        UserDO newUser = new UserDO()
-//                .setOrgId(newOrg.getId())
-//                .setName(phoneNumber)
-//                .setUsername(phoneNumber)
-//                .setMobile(phoneNumber)
-//                .setPasswd("")
-//                .setStatus(UserStatus.NORMAL.value)
-//                .setAdmin(true)
-//                .setCreateTime(now)
-//                .setUpdateTime(now);
-//        userDao.insertAdmin(newUser);
-//
-//        saveMiniAppBindId(newUser.getId(), openId, unionId, UserStatus.NORMAL.value, appId);
-//        return newUser;
-//    }
-//
+
+    /**
+     * 检查微信用户绑定状态
+     */
+    private WxUserBindStatus checkUserBindStatus(Integer userId, String miniAppOpenId, String appId) {
+        ThirdUserDO existBindUser = thirdUserDao.getByUserId(userId, ThirdUserType.WX_MINI_APP_USER.type, appId);
+
+        // 系统用户已绑定微信账号
+        if (Objects.nonNull(existBindUser)) {
+            if (!Objects.equals(existBindUser.getOpenId(), miniAppOpenId)) {
+                return WxUserBindStatus.SYS_USER_HAS_BIND_OTHER;
+            }
+            return WxUserBindStatus.HAS_BIND;
+        }
+
+        // 微信账号已绑定用户
+        existBindUser = thirdUserDao.getByOpenId(miniAppOpenId, ThirdUserType.WX_MINI_APP_USER.type, appId);
+        if (Objects.nonNull(existBindUser)) {
+            if (!Objects.equals(existBindUser.getUserId().intValue(), userId)) {
+                return WxUserBindStatus.WX_USER_HAS_BIND_OTHER;
+            }
+            return WxUserBindStatus.HAS_BIND;
+        }
+        return WxUserBindStatus.NOT_BIND_WX_USER;
+    }
+
+    public UserDO registerNewUser(String phoneNumber, String openId, String unionId, String appId) {
+        LocalDateTime now = DateUtil.nowTime();
+        OrgDO newOrg = new OrgDO()
+                .setName(phoneNumber)
+                .setRemark("用户注册自动创建的机构")
+                .setCreateTime(now)
+                .setUpdateTime(now);
+        orgDao.insert(newOrg);
+
+        UserDO newUser = new UserDO()
+                .setOrgId(newOrg.getId())
+                .setName(phoneNumber)
+                .setUsername(phoneNumber)
+                .setMobile(phoneNumber)
+                .setPasswd("")
+                .setStatus(UserStatus.NORMAL.value)
+                .setAdmin(true)
+                .setCreateTime(now)
+                .setUpdateTime(now);
+        userDao.insertAdmin(newUser);
+
+        saveMiniAppBindId(newUser.getId(), openId, unionId, UserStatus.NORMAL.value, appId);
+        return newUser;
+    }
+
+    //
 //    public void saveOfficialAccountBindId(Long userId, String openId, String unionId) {
 //        LocalDateTime now = DateUtil.nowTime();
 //        // 公众号
@@ -287,20 +324,20 @@ public class WxUserService {
 //        thirdUserDao.saveOrDoNothing(officialAccountAppUser);
 //    }
 //
-//    private void saveMiniAppBindId(long userId, String openId, String unionId, Integer userStatus, String appId) {
-//        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
-//        // 小程序
-//        ThirdUserDO miniAppUser = new ThirdUserDO()
-//                .setType(ThirdUserType.WX_MINI_APP_USER.type)
-//                .setAppId(appId)
-//                .setOpenId(openId)
-//                .setUnionId(unionId)
-//                .setUserId(userId)
-//                .setStatus(userStatus)
-//                .setCreateTime(now)
-//                .setUpdateTime(now);
-//        thirdUserDao.saveOrDoNothing(miniAppUser);
-//    }
+    private void saveMiniAppBindId(long userId, String openId, String unionId, Integer userStatus, String appId) {
+        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        // 小程序
+        ThirdUserDO miniAppUser = new ThirdUserDO()
+                .setType(ThirdUserType.WX_MINI_APP_USER.type)
+                .setAppId(appId)
+                .setOpenId(openId)
+                .setUnionId(unionId)
+                .setUserId(userId)
+                .setStatus(userStatus)
+                .setCreateTime(now)
+                .setUpdateTime(now);
+        thirdUserDao.saveOrDoNothing(miniAppUser);
+    }
 //
 //    public WxMpUser getOfficialAccountUserInfo(String openId) {
 //        try {

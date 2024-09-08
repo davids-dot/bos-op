@@ -24,15 +24,15 @@ allprojects {
         maven {
             isAllowInsecureProtocol = true
             setUrl(extra["repoGroupUrl"].toString())
-
             credentials {
                 username = project.properties["NS_USER"].toString()
                 password = project.properties["NS_PASSWD"].toString()
             }
         }
-        mavenCentral()
+        maven("https://maven.aliyun.com/repository/public")
         maven("https://repo.spring.io/milestone")
         maven("https://repo.spring.io/snapshot")
+        maven("https://mirrors.huaweicloud.com/repository/maven/huaweicloudsdk")
     }
 }
 

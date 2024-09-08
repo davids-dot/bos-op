@@ -2,7 +2,7 @@ package com.luoge.bos.uc.dubbo;
 
 import com.luoge.bos.uc.service.AuthenticationService;
 import com.luoge.bos.uc.service.AuthorizationService;
-import com.luoge.bos.uc.service.UserService;
+import com.luoge.bos.uc.service.BosUserService;
 import com.luoge.bos.uc.model.User;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class UCServiceImpl implements UCService {
     private AuthorizationService authorizationService;
 
     @Resource
-    private UserService ucService;
+    private BosUserService ucService;
 
     @Override
     public User getUser(int userId) {

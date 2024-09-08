@@ -1,36 +1,28 @@
 package com.luoge.app.uc.service;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.crypto.digest.DigestAlgorithm;
-import cn.hutool.crypto.digest.Digester;
-import com.alibaba.nacos.common.utils.CollectionUtils;
 import com.luoge.app.uc.auth.CacheService;
+import com.luoge.app.uc.model.User;
+import com.luoge.app.uc.model.UserUpdateBO;
 import com.luoge.bos.core.utils.DateUtil;
 import com.luoge.bos.data.UserDao;
 import com.luoge.bos.data.entity.UserDO;
 import com.luoge.ns.core.R;
 import com.luoge.ns.uc.core.UCCode;
-import com.luoge.ns.uc.core.UserBindStatus;
-
-import com.luoge.ns.uc.model.EnterpriseUser;
-import com.luoge.ns.uc.model.User;
+import com.luoge.app.uc.model.User;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 public class UserService {
     @Resource
     private UserDao userDao;
 
-//    @Resource
-//    private CacheService cacheService;
+    @Resource
+    private CacheService cacheService;
 
 //    @Resource
 //    private EnterpriseService enterpriseService;
@@ -163,9 +155,39 @@ public class UserService {
 //        return R.SUCCESS;
 //    }
 
-//    public UserDO get(long userId) {
-//        return userDao.getById((int) userId);
-//    }
+    public UserDO get(long userId) {
+        return userDao.getById((int) userId);
+    }
+
+    public R<UserDO> update(int orgId, UserUpdateBO userUpdateBO) {
+        var userDO = userDao.getByMobile(userUpdateBO.getMobile());
+        if (Objects.nonNull(userDO) && !Objects.equals(userDO.getId(), userUpdateBO.getId())) {
+            return R.fail(UCCode.INVALID_MOBILE);
+        }
+        if (StringUtils.isNotBlank(userUpdateBO.getEmail())) {
+            userDO = userDao.getByEmail(userUpdateBO.getEmail());
+            if (Objects.nonNull(userDO) && !Objects.equals(userDO.getId(), userUpdateBO.getId())) {
+                return R.fail(UCCode.INVALID_EMAIL);
+            }
+        }
+
+        var user = BeanUtil.copyProperties(userUpdateBO, UserDO.class);
+        user.setEmail(StringUtils.isBlank(user.getEmail()) ? null : user.getEmail());
+        user.setOrgId(orgId);
+        user.setUpdateTime(DateUtil.nowTime());
+        userDao.update(user);
+
+        // 刷新缓存用户信息
+        User cacheUser = cacheService.getUser(userDO.getId());
+        if (cacheUser != null) {
+            cacheUser.setName(user.getName());
+            cacheUser.setEmail(user.getEmail());
+            cacheUser.setMobile(user.getMobile());
+            cacheUser.setRemark(user.getRemark());
+            cacheService.setUser(cacheUser.getId(), cacheUser);
+        }
+        return R.success(userDO);
+    }
 //
 //    public List<EnterpriseUser> listEnterpriseUsers(int orgId, int enterpriseId, String thirdAppId) {
 //        List<UserDO> users = enterpriseService.listEnterpriseUsers(orgId, enterpriseId, null);

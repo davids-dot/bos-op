@@ -1,17 +1,19 @@
 package com.luoge.bos.invoice.org.enterprise;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.luoge.bos.invoice.model.org.*;
-import com.luoge.bos.invoice.park.enterprise.ParkEnterpriseDao;
 import com.luoge.bos.core.BosAppCode;
 import com.luoge.bos.core.model.PageQuery;
 import com.luoge.bos.core.utils.DateUtil;
+import com.luoge.bos.data.EnterpriseDao;
+import com.luoge.bos.data.OrgDao;
+import com.luoge.bos.data.entity.OrgDO;
+import com.luoge.bos.data.model.OrgEnterpriseBO;
 import com.luoge.bos.invoice.common.RegionDao;
 import com.luoge.bos.invoice.entity.ParkEnterpriseDO;
-import com.luoge.bos.invoice.entity.uc.EnterpriseDO;
-import com.luoge.bos.invoice.entity.uc.OrgDO;
+import com.luoge.bos.data.entity.EnterpriseDO;
 import com.luoge.bos.invoice.entity.uc.RegionDO;
-import com.luoge.bos.invoice.org.OrgDao;
+import com.luoge.bos.invoice.model.org.*;
+import com.luoge.bos.invoice.park.enterprise.ParkEnterpriseDao;
 import com.luoge.ns.core.Page;
 import com.luoge.ns.core.R;
 import jakarta.annotation.Resource;
@@ -73,13 +75,13 @@ public class EnterpriseService {
         List<OrgDO> orgList = orgDao.listAll();
 
         List<EnterpriseBO> results = enterprises.stream()
-                .map(x -> toEnterpriseBO(x, null,orgList))
+                .map(x -> toEnterpriseBO(x, null, orgList))
                 .toList();
         return new Page<>(enterprises.getTotal(), results);
     }
 
     private EnterpriseBO toEnterpriseBO(EnterpriseDO enterpriseDO, RegionDO regionDO, List<OrgDO> orgList) {
-        OrgDO orgDO = CollectionUtils.isNotEmpty(orgList) ? findOrg(orgList,enterpriseDO.getOrgId()) : null;
+        OrgDO orgDO = CollectionUtils.isNotEmpty(orgList) ? findOrg(orgList, enterpriseDO.getOrgId()) : null;
         return new EnterpriseBO()
                 .setId(enterpriseDO.getId())
                 .setOrgId(enterpriseDO.getOrgId())

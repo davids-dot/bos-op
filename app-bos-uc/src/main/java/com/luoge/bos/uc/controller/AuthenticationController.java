@@ -1,9 +1,9 @@
 package com.luoge.bos.uc.controller;
 
-import com.luoge.bos.uc.model.AuthenticationBO;
-import com.luoge.bos.uc.service.UserService;
 import com.luoge.bos.uc.ctx.Context;
+import com.luoge.bos.uc.model.AuthenticationBO;
 import com.luoge.bos.uc.service.AuthenticationService;
+import com.luoge.bos.uc.service.BosUserService;
 import com.luoge.ns.core.R;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -23,7 +23,7 @@ public class AuthenticationController {
     @Resource
     private AuthenticationService authenticationService;
     @Resource
-    private UserService userService;
+    private BosUserService bosUserService;
 
     /**
      * 登录

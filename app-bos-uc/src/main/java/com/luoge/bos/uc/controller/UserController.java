@@ -1,7 +1,7 @@
 package com.luoge.bos.uc.controller;
 
 import com.luoge.bos.uc.model.user.*;
-import com.luoge.bos.uc.service.UserService;
+import com.luoge.bos.uc.service.BosUserService;
 import com.luoge.bos.uc.core.UCCode;
 import com.luoge.bos.uc.core.UCValidator;
 import com.luoge.bos.uc.ctx.Context;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @Resource
-    private UserService userService;
+    private BosUserService bosUserService;
 
 
     /**
@@ -33,7 +33,7 @@ public class UserController {
      */
     @GetMapping("users")
     public R<List<UserVO>> listUsers(String name, Context ctx) {
-        return R.success(userService.listUser(ctx.getOrgId(), name));
+        return R.success(bosUserService.listUser(ctx.getOrgId(), name));
     }
 
     /**
@@ -46,7 +46,7 @@ public class UserController {
         if (!UCValidator.validatePassword(user.getPasswd())) {
             return R.fail(UCCode.PASSWORD_FORMAT_ERROR);
         }
-        return userService.insert(ctx.getOrgId(), user);
+        return bosUserService.insert(ctx.getOrgId(), user);
     }
 
     /**
@@ -56,7 +56,7 @@ public class UserController {
      */
     @PutMapping("users")
     public R<Void> update(@RequestBody @Valid UserUpdateBO user, Context ctx) {
-        return userService.update(ctx.getOrgId(), user);
+        return bosUserService.update(ctx.getOrgId(), user);
     }
 
 
@@ -72,13 +72,13 @@ public class UserController {
         if (!UCValidator.validatePassword(reset.getPasswd())) {
             return R.fail(UCCode.PASSWORD_FORMAT_ERROR);
         }
-        userService.resetPasswd(ctx.getOrgId(), reset.getUserId(), reset.getPasswd());
+        bosUserService.resetPasswd(ctx.getOrgId(), reset.getUserId(), reset.getPasswd());
         return R.SUCCESS;
     }
 
     @PutMapping("users/status")
     public R<Void> updateStatus(@RequestBody @Valid UserStatusBO userStatusBO, Context ctx) {
-        userService.updateStatus(ctx.getOrgId(), userStatusBO.getUserId(), userStatusBO.getStatus());
+        bosUserService.updateStatus(ctx.getOrgId(), userStatusBO.getUserId(), userStatusBO.getStatus());
         return R.SUCCESS;
     }
 
@@ -91,7 +91,7 @@ public class UserController {
      */
     @GetMapping("users/roles")
     public R<List<String>> listUserRoles(Integer userId, Context ctx) {
-        var r = userService.listUserRoles(ctx.getOrgId(), userId);
+        var r = bosUserService.listUserRoles(ctx.getOrgId(), userId);
         return R.success(r.stream().map(String::valueOf).collect(Collectors.toList()));
     }
 
@@ -104,7 +104,7 @@ public class UserController {
      */
     @PutMapping("users/roles")
     public R<Void> setUserRoles(@RequestBody @Valid UserRoleBO userRoleBO, Context ctx) {
-        userService.setUserRoles(ctx.getOrgId(), userRoleBO.getUserId(), userRoleBO.getRoleIds());
+        bosUserService.setUserRoles(ctx.getOrgId(), userRoleBO.getUserId(), userRoleBO.getRoleIds());
         return R.SUCCESS;
     }
 }

@@ -2,9 +2,11 @@ package com.luoge.app.uc.wx;
 
 import com.luoge.app.uc.configuration.WxConfiguration;
 import com.luoge.app.uc.model.LoginByCodeBO;
+import com.luoge.app.uc.model.LoginByMobileAndCodeBO;
 import com.luoge.app.uc.model.LoginResultBO;
+import com.luoge.app.uc.wxctx.WxContext;
+import com.luoge.bos.uc.core.UCCode;
 import com.luoge.ns.core.R;
-import com.luoge.ns.uc.core.UCCode;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,13 +37,16 @@ public class WxUserController {
     /**
      * 使用手机号、验证码和code登录
      */
-//    @PostMapping("/sign-in/mobile-and-code")
-//    public R<LoginResultBO> loginByMobileAndCode(@Valid @RequestBody LoginByMobileAndCodeBO loginBO, WxContext ctx) {
-//        if (loginBO.getCode().contains("mock one")) {
-//            return R.fail(UCCode.WX_MOCK_USER);
-//        }
-//        return wxUserService.loginAndBindMiniAppByPhone(loginBO, ctx.getAppId());
-//    }
+    @PostMapping("/sign-in/mobile-and-code")
+    public R<LoginResultBO> loginByMobileAndCode(@Valid @RequestBody LoginByMobileAndCodeBO loginBO, WxContext ctx) {
+        if (loginBO.getCode().contains("mock one")) {
+            return R.fail(UCCode.WX_MOCK_USER);
+        }
+        return wxUserService.loginAndBindMiniAppByPhone(loginBO, ctx.getAppId());
+    }
+
+
+    // TODO user and code
 
 
 }

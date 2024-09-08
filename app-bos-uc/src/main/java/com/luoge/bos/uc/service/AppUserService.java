@@ -10,6 +10,7 @@ import com.luoge.bos.uc.core.UCCode;
 import com.luoge.bos.uc.model.user.UserCreateBO;
 import com.luoge.bos.uc.model.user.UserUpdateBO;
 import com.luoge.bos.uc.model.user.UserVO;
+import com.luoge.bos.uc.utils.DateUtil;
 import com.luoge.ns.core.R;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -63,7 +65,7 @@ public class AppUserService {
         // 密码加密存储
         user.setPasswd(crypt(user.getPasswd()));
         user.setOrgId(orgId);
-        Date now = new Date();
+        LocalDateTime now = DateUtil.nowTime();
         user.setCreateTime(now);
         user.setUpdateTime(now);
         nsUserDao.insert(user);
@@ -82,7 +84,7 @@ public class AppUserService {
 
         var user = BeanUtil.copyProperties(userUpdateBO, UserDO.class);
         user.setOrgId(orgId);
-        user.setUpdateTime(new Date());
+        user.setUpdateTime(DateUtil.nowTime());
         nsUserDao.update(user);
         return R.SUCCESS;
     }

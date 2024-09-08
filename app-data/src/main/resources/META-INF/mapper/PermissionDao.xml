@@ -18,4 +18,126 @@
              iam_permission_resource b
         WHERE a.id = b.resource_id
     </select>
+
+
+    <resultMap id="resourceMap" type="com.luoge.bos.data.entity.ResourceDO">
+        <id property="id" column="resource_id"/>
+        <result property="name" column="resource_name"/>
+        <result property="url" column="resource_url"/>
+    </resultMap>
+
+    <resultMap id="menuMap" type="com.luoge.bos.data.entity.MenuDO">
+        <id property="id" column="menu_id"/>
+        <id property="parentId" column="menu_parent_id"/>
+        <result property="appId" column="menu_app_id"/>
+        <result property="name" column="menu_name"/>
+        <result property="url" column="menu_url"/>
+        <result property="seq" column="menu_seq"/>
+    </resultMap>
+
+    <resultMap id="permissionMap" type="com.luoge.bos.data.entity.PermissionDO">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="seq" column="seq"/>
+        <result property="remark" column="remark"/>
+        <collection property="resources" ofType="com.luoge.bos.data.entity.ResourceDO" resultMap="resourceMap"/>
+        <collection property="menus" ofType="com.luoge.bos.data.entity.MenuDO" resultMap="menuMap"/>
+    </resultMap>
+
+    <select id="listWithResources" resultMap="permissionMap">
+        SELECT p.id,
+               p.parent_id,
+               p.code,
+               p.name,
+               p.seq,
+               p.remark,
+               r.id   AS resource_id,
+               r.name AS resource_name,
+               r.url  AS resource_url
+        FROM iam_permission p
+                 LEFT JOIN iam_permission_resource pr ON p.id = pr.permission_id
+                 LEFT JOIN iam_resource r ON pr.resource_id = r.id
+    </select>
+
+    <select id="listWithMenus" resultMap="permissionMap">
+        SELECT p.id,
+               p.parent_id,
+               p.code,
+               p.name,
+               p.seq,
+               p.remark,
+               m.id        AS menu_id,
+               m.parent_id as menu_parent_id,
+               m.app_id    as menu_app_id,
+               m.name      AS menu_name,
+               m.url       AS menu_url,
+               m.seq       AS menu_seq
+        FROM iam_permission p
+                 LEFT JOIN iam_permission_menu pm ON p.id = pm.permission_id
+                 LEFT JOIN iam_menu m ON pm.menu_id = m.id
+    </select>
+
+    <select id="getMaxSeq" resultType="int">
+        SELECT count(*)
+        FROM iam_permission
+        WHERE parent_id = #{parentId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO iam_permission(code, name, seq, remark, parent_id, create_time, update_time)
+        VALUES (#{code}, #{name}, #{seq}, #{remark}, #{parentId}, #{createTime}, #{updateTime})
+    </insert>
+
+
+    <update id="update">
+        UPDATE iam_permission
+        SET name        = #{name},
+            code        = #{code},
+            remark      = #{remark},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE
+        FROM iam_permission
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deletePermissionMenu">
+        DELETE
+        FROM iam_permission_menu
+        WHERE permission_id = #{permissionId}
+    </delete>
+
+    <delete id="deletePermissionResource">
+        DELETE
+        FROM iam_permission_resource
+        WHERE permission_id = #{permissionId}
+    </delete>
+
+    <delete id="deletePermissionRole">
+        DELETE
+        FROM iam_role_permission
+        WHERE permission_id = #{permissionId}
+    </delete>
+
+    <insert id="insertPermissionResources">
+        INSERT INTO iam_permission_resource(permission_id, resource_id, create_time)
+        VALUES
+        <foreach collection="resourceIds" item="resourceId" separator=",">
+            (#{permissionId}, #{resourceId}, #{now})
+        </foreach>
+    </insert>
+
+    <insert id="insertPermissionMenus">
+        INSERT INTO iam_permission_menu(permission_id, menu_id, create_time)
+        VALUES
+        <foreach collection="menuIds" item="menuId" separator=",">
+            (#{permissionId}, #{menuId}, #{now})
+        </foreach>
+    </insert>
+
 </mapper>

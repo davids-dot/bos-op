@@ -1,15 +1,14 @@
 package com.luoge.bos.uc.controller;
 
+import com.luoge.bos.uc.core.UCCode;
 import com.luoge.bos.uc.core.UCValidator;
+import com.luoge.bos.uc.ctx.Context;
 import com.luoge.bos.uc.model.MenuBO;
+import com.luoge.bos.uc.model.User;
 import com.luoge.bos.uc.model.user.ChangePasswordBO;
 import com.luoge.bos.uc.service.AuthenticationService;
 import com.luoge.bos.uc.service.AuthorizationService;
-import com.luoge.bos.uc.service.UserService;
-import com.luoge.bos.uc.core.UCCode;
-import com.luoge.bos.uc.ctx.Context;
-
-import com.luoge.bos.uc.model.User;
+import com.luoge.bos.uc.service.BosUserService;
 import com.luoge.ns.core.R;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -30,7 +29,7 @@ public class AuthorizationController {
     private AuthorizationService authorizationService;
 
     @Resource
-    private UserService userService;
+    private BosUserService bosUserService;
 
     /**
      * 获取用户菜单
@@ -56,9 +55,9 @@ public class AuthorizationController {
     @PutMapping("users/passwd/change")
     public R<Void> changePasswd(@RequestBody @Valid ChangePasswordBO reset, Context ctx) {
         if (!UCValidator.validatePassword(reset.getNewPassword())
-        || !UCValidator.validatePassword(reset.getOldPassword())) {
+                || !UCValidator.validatePassword(reset.getOldPassword())) {
             return R.fail(UCCode.PASSWORD_FORMAT_ERROR);
         }
-        return userService.changePasswd(ctx.getOrgId(), ctx.getUserId(), reset.getOldPassword(), reset.getNewPassword());
+        return bosUserService.changePasswd(ctx.getOrgId(), ctx.getUserId(), reset.getOldPassword(), reset.getNewPassword());
     }
 }

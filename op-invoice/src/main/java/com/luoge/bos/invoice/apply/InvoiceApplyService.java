@@ -297,10 +297,6 @@ public class InvoiceApplyService {
             template = WxPushMsgTemplate.INVOICE_APPLY_REJECTED;
             messageParams.put("rejectedTime", DateUtil.toDateTimeString(now));
         }
-
-        notificationService.sendWxTemplateMessage(invoiceApply.getUserId(),
-                template,
-                messageParams);
     }
 
 }

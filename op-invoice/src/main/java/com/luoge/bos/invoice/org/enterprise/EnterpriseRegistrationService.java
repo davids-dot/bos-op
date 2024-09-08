@@ -5,10 +5,6 @@ import cn.hutool.core.text.StrPool;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.excel.util.StringUtils;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
-import com.luoge.bos.invoice.model.org.*;
-import com.luoge.bos.invoice.util.ExcelUtils;
-import com.luoge.bos.invoice.util.InvokeUtil;
-import com.luoge.bos.invoice.util.ZipUtil;
 import com.luoge.bos.core.BosAppCode;
 import com.luoge.bos.core.model.FileBO;
 import com.luoge.bos.core.model.PageQuery;
@@ -18,6 +14,8 @@ import com.luoge.bos.core.types.OperationRecord;
 import com.luoge.bos.core.utils.DateUtil;
 import com.luoge.bos.core.utils.Numbers;
 import com.luoge.bos.core.utils.StrUtil;
+import com.luoge.bos.data.EnterpriseDao;
+import com.luoge.bos.data.OrgDao;
 import com.luoge.bos.invoice.common.FileService;
 import com.luoge.bos.invoice.common.IndustryDao;
 import com.luoge.bos.invoice.common.OperationRecordService;
@@ -26,9 +24,12 @@ import com.luoge.bos.invoice.configuration.AppConfig;
 import com.luoge.bos.invoice.entity.invoice.EnterpriseRegistrationDO;
 import com.luoge.bos.invoice.entity.invoice.IndustryDO;
 import com.luoge.bos.invoice.entity.invoice.OperationRecordDO;
-import com.luoge.bos.invoice.entity.uc.EnterpriseDO;
+import com.luoge.bos.data.entity.EnterpriseDO;
 import com.luoge.bos.invoice.model.excel.EnterpriseRegistrationTpl;
-import com.luoge.bos.invoice.org.OrgDao;
+import com.luoge.bos.invoice.model.org.*;
+import com.luoge.bos.invoice.util.ExcelUtils;
+import com.luoge.bos.invoice.util.InvokeUtil;
+import com.luoge.bos.invoice.util.ZipUtil;
 import com.luoge.ns.core.Page;
 import com.luoge.ns.core.R;
 import com.luoge.ns.uc.model.msg.WxPushMsgTemplate;
@@ -200,7 +201,7 @@ public class EnterpriseRegistrationService {
             return R.fail(BosAppCode.ENTERPRISE_REG_NOT_EXIST);
         }
         //校验状态
-        if (ObjectUtil.equals(EnterpriseRegistration.Status.DONE.status,enterpriseRegistration.getStatus())){
+        if (ObjectUtil.equals(EnterpriseRegistration.Status.DONE.status, enterpriseRegistration.getStatus())) {
             return R.fail(BosAppCode.ENTERPRISE_REG_AUDITED);
         }
         EnterpriseRegistration.Action action = Objects.equals(registrationStatusBO.getOperation(), 1) ? EnterpriseRegistration.Action.APPROVE : EnterpriseRegistration.Action.MARK_DEPRECATED;
@@ -213,7 +214,7 @@ public class EnterpriseRegistrationService {
         LocalDateTime updateTime = DateUtil.nowTime();
         enterpriseRegistrationDao.updateStatus(registrationId, nextStatus.getData().status, updateTime);
 
-        InvokeUtil.runAsync(()->{
+        InvokeUtil.runAsync(() -> {
             // 写入操作日志
             saveOperationLog(registrationId, action == EnterpriseRegistration.Action.APPROVE ? OperationRecord.OperationType.APPROVE.type :
                     OperationRecord.OperationType.DEPRECATED.type);
@@ -241,9 +242,6 @@ public class EnterpriseRegistrationService {
             messageParams.put("deprecateTime", DateUtil.toDateTimeString(updateTime));
         }
 
-        notificationService.sendWxTemplateMessage(enterpriseRegistration.getUserId(),
-                template,
-                messageParams);
     }
 
     private void saveOperationLog(Long registrationId, String action) {
@@ -293,21 +291,21 @@ public class EnterpriseRegistrationService {
         // 记录操作日志
         saveOperationLog(registrationId, OperationRecord.OperationType.DONE.type);
         // 发送微信模板消息
-        sendRegistrationFinishMessage(regResult, enterpriseRegistrationDO,registrationDO.getUserId());
+        sendRegistrationFinishMessage(regResult, enterpriseRegistrationDO, registrationDO.getUserId());
 
         return R.SUCCESS;
     }
 
     private void sendRegistrationFinishMessage(EnterpriseRegistrationResultBO regResult,
-                                               EnterpriseRegistrationDO enterpriseRegistrationDO,Integer userId) {
+                                               EnterpriseRegistrationDO enterpriseRegistrationDO, Integer userId) {
         Map<String, String> messageParams = new HashMap<>();
         messageParams.put("id", String.valueOf(enterpriseRegistrationDO.getId()));
         messageParams.put("enterpriseName", regResult.getEnterpriseName());
         messageParams.put("enterpriseTaxNo", regResult.getEnterpriseTaxNo());
         messageParams.put("finishTime", DateUtil.toDateTimeString(enterpriseRegistrationDO.getUpdateTime()));
 
-        notificationService.sendWxTemplateMessage(userId,
-                WxPushMsgTemplate.ENTERPRISE_REGISTRATION_DONE, messageParams);
+//        notificationService.sendWxTemplateMessage(userId,
+//                WxPushMsgTemplate.ENTERPRISE_REGISTRATION_DONE, messageParams);
     }
 
     public EnterpriseDO toEnterpriseDO(EnterpriseRegistrationResultBO registrationResultBO, Integer orgId) {
@@ -344,7 +342,7 @@ public class EnterpriseRegistrationService {
         // 设置响应头信息 write前设置否则不生效
         response.setContentType("application/octet-stream");
         // 使用URLEncoder.encode 防止中文乱码
-        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(enterpriseRegistration.getCorporateName() + "_工商注册申请资料.zip","UTF-8"));
+        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(enterpriseRegistration.getCorporateName() + "_工商注册申请资料.zip", "UTF-8"));
 
         // 组装成excel
         EnterpriseRegistrationTpl registrationTpl = toEnterpriseRegistrationTpl(enterpriseRegistration);

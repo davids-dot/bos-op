@@ -8,8 +8,8 @@ dependencies {
     // Second-party packages
     implementation("com.luoge.ns:base-core:1.0-SNAPSHOT")
     implementation("com.luoge.bos:uc-api:1.0-SNAPSHOT")
+   // implementation("com.luoge.ns:uc-context:1.0-SNAPSHOT")
     implementation("com.luoge.bos:uc-context:1.0-SNAPSHOT")
-
     // Third-party packages
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")

@@ -50,11 +50,18 @@ dependencies {
 tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
 tasks.register<Copy>("copyTask") {
     from("src/main/resources")
     into("build/output")
     // 设置重复文件处理策略
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+tasks.getByName("distTar").enabled = false
+tasks.getByName("distZip").enabled = false
+
+tasks.withType<Copy> {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE // 或者 DuplicatesStrategy.SKIP
 }
 
 tasks {

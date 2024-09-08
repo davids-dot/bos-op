@@ -1,7 +1,7 @@
 package com.luoge.bos.invoice.park.enterprise;
 
 import com.luoge.bos.invoice.model.org.EnterpriseDetailBO;
-import com.luoge.bos.invoice.model.org.OrgEnterpriseBO;
+import com.luoge.bos.data.model.OrgEnterpriseBO;
 import com.luoge.bos.invoice.model.park.enterprise.ParkEnterpriseDetailBO;
 import com.luoge.bos.core.BOSConsts;
 import com.luoge.bos.core.model.PageQuery;

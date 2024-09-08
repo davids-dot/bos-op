@@ -66,4 +66,76 @@
         where email = #{email}
     </select>
 
+
+    <insert id="insertAdmin" parameterType="com.luoge.bos.data.entity.UserDO" keyProperty="id" keyColumn="id"
+            useGeneratedKeys="true">
+        INSERT INTO iam_user(org_id, name, username, mobile, email, passwd,
+                             avatar, status, remark, admin, create_time, update_time)
+        VALUES (#{orgId}, #{name}, #{username}, #{mobile}, #{email}, #{passwd},
+                #{avatar}, 1, #{remark}, 1, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE iam_user
+        SET status = #{status}
+        WHERE org_id = #{orgId}
+          AND id = #{userId}
+    </update>
+
+    <update id="resetPasswd">
+        UPDATE iam_user
+        SET passwd = #{passwd}
+        WHERE org_id = #{orgId}
+          AND id = #{userId}
+    </update>
+
+    <delete id="deleteUserRoles">
+        DELETE
+        FROM iam_user_role
+        WHERE org_id = #{orgId}
+          AND user_id = #{userId}
+    </delete>
+
+    <insert id="insertUserRoles">
+        INSERT INTO iam_user_role(org_id, user_id, role_id, create_time) VALUES
+        <foreach item="roleId" collection="roleIds" separator=",">
+            (#{orgId}, #{userId}, #{roleId}, #{createTime})
+        </foreach>
+    </insert>
+
+    <select id="getByUsername" resultType="com.luoge.bos.data.entity.UserDO">
+        SELECT
+        <include refid="cols"/>
+        FROM iam_user
+        WHERE username = #{username}
+    </select>
+
+    <select id="listUserRoles" resultType="java.lang.Integer">
+        SELECT role_id
+        FROM iam_user_role
+        WHERE org_id = #{orgId}
+          AND user_id = #{userId}
+    </select>
+
+    <select id="listUserPermissions" resultType="java.lang.String">
+        SELECT p.code
+        from iam_permission p
+                 JOIN iam_role_permission rp on p.id = rp.permission_id
+        where role_id IN (select role_id from iam_user_role where org_id = #{orgId} and user_id = #{userId})
+    </select>
+    <select id="get" resultType="com.luoge.bos.data.entity.UserDO">
+        SELECT
+        <include refid="cols"/>
+        FROM iam_user
+        WHERE id = #{userId}
+        AND org_id = #{orgId}
+    </select>
+
+    <select id="getById" resultType="com.luoge.bos.data.entity.UserDO">
+        SELECT
+        <include refid="cols"/>
+        FROM iam_user
+        WHERE id = #{userId}
+    </select>
+
 </mapper>

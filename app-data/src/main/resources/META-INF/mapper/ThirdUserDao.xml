@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luoge.bos.data.ThirdUserDao">
+
+    <sql id="cols">
+        <trim>
+            id ,type, open_id,user_id, union_id,status, remark, ext, create_time, update_time
+        </trim>
+    </sql>
+
+    <insert id="saveOrDoNothing">
+        insert ignore into iam_user_thirds (type, app_id, open_id, user_id,
+                                            union_id, status, remark, ext,
+                                            create_time, update_time)
+        values (#{thirdUser.type}, #{thirdUser.appId}, #{thirdUser.openId}, #{thirdUser.userId},
+                #{thirdUser.unionId}, #{thirdUser.status}, #{thirdUser.remark}, #{thirdUser.ext},
+                #{thirdUser.createTime}, #{thirdUser.updateTime})
+    </insert>
+
+    <select id="getByOpenId" resultType="com.luoge.bos.data.entity.ThirdUserDO">
+        select
+        <include refid="cols"/>
+        from iam_user_thirds
+        where open_id = #{openId}
+        and type = #{type}
+        and app_id = #{appId}
+    </select>
+
+    <select id="getByUserId" resultType="com.luoge.bos.data.entity.ThirdUserDO">
+        select
+        <include refid="cols"/>
+        from iam_user_thirds
+        where user_id = #{userId}
+        and type = #{type}
+        and app_id = #{appId}
+    </select>
+
+    <delete id="deleteByOpenId">
+        delete
+        from iam_user_thirds
+        where open_id = #{openId}
+          and type = #{type}
+          and app_id = #{appId}
+    </delete>
+
+    <select id="listEnterpriseUserStatus">
+        select
+        t1.user_id id,
+        case
+        when t2.user_id is null then 2
+        else 3
+        end as bind_status
+        from iam_user_thirds t1
+        left join iam_user_thirds t2
+        on t1.user_id = t2.user_id
+        and t2.type = 3
+        where t1.type = 1
+        and t1.app_id = #{appId}
+        and t1.user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </select>
+
+    <select id="getByUnionId" resultType="com.luoge.bos.data.entity.ThirdUserDO">
+        select
+        <include refid="cols"/>
+        from iam_user_thirds
+        where union_id = #{unionId}
+        and type = #{type}
+    </select>
+
+    <update id="updateUserIdByUnionId">
+        update iam_user_thirds
+        set user_id = #{userId}
+        where union_id = #{unionId}
+    </update>
+
+</mapper>

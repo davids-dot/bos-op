@@ -1,4 +1,4 @@
-package com.luoge.bos;
+package com.luoge;
 
 import org.dromara.x.file.storage.spring.EnableFileStorage;
 import org.springframework.boot.SpringApplication;
@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableFileStorage
 @EnableScheduling
 @EnableTransactionManagement
-@SpringBootApplication(scanBasePackages = {"com.luoge.bos"})
+@SpringBootApplication(scanBasePackages = {"com.luoge"})
 public class OperationApplication {
 
     public static void main(String[] args) {

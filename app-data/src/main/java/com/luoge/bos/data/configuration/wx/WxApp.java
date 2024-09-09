@@ -9,18 +9,16 @@ public class WxApp {
         return appId;
     }
 
-    public WxApp setAppId(String appId) {
+    public void setAppId(String appId) {
         this.appId = appId;
-        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public WxApp setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getSecret() {
@@ -31,5 +29,4 @@ public class WxApp {
         this.secret = secret;
         return this;
     }
-
 }

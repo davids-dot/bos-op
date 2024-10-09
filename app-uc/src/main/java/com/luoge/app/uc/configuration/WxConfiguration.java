@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class WxConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(WxConfiguration.class);
 
-    @Value("${wx.miniApp.invoice.appId")
+    @Value("${wx.mini-app.invoice.app-id}")
     private String appId;
 
     @Resource

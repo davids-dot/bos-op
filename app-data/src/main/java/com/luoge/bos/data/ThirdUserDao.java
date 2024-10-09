@@ -1,11 +1,14 @@
 package com.luoge.bos.data;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
+import com.luoge.bos.core.BOSConsts;
 import com.luoge.bos.data.entity.ThirdUserDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@DS(BOSConsts.DataSource.UC)
 @Mapper
 public interface ThirdUserDao {
     /**

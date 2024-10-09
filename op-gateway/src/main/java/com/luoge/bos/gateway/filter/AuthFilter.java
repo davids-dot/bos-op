@@ -73,6 +73,14 @@ public class AuthFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
+        // 如果是小程序端
+        boolean isMobile = Urls.isMobile(path);
+        if (isMobile) {
+            renderMobile(path);
+            return;
+        }
+
+
         if (Objects.isNull(userId)) {
             renderFail(Code.UNAUTHORIZED, "用户没有登录", response);
             return;
@@ -90,6 +98,9 @@ public class AuthFilter implements Filter {
         }
         HttpServletRequest wrappedRequest = setAuthenticationInfo(orgId, userId, req);
         chain.doFilter(wrappedRequest, response);
+    }
+
+    private void renderMobile(String path) {
     }
 
     private HttpServletRequest setAuthenticationInfo(Integer orgId, Integer userId, HttpServletRequest req) {
@@ -114,6 +125,11 @@ public class AuthFilter implements Filter {
             case Code.UNAUTHORIZED, Code.FORBIDDEN, Code.NOT_FOUNT, Code.SYSTEM_ERROR -> code;
             default -> Code.SUCCESS;
         };
+        HttpUtil.writeRes((HttpServletResponse) response, httpStatusCode, content);
+    }
+
+    private void renderMobileFail(int code, int httpStatusCode, String message, ServletResponse response) {
+        String content = JsonUtil.toJsonString(R.fail(code, message));
         HttpUtil.writeRes((HttpServletResponse) response, httpStatusCode, content);
     }
 

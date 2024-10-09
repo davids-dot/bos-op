@@ -26,7 +26,7 @@ public class CacheService {
 //    public void setVerificationCode(String mobile, VerificationCodeBO code) {
 //    }
 //
-    @Cached(name = Constants.CACHE_VERIFICATION_CODE, key = "#mobile", expire = Constants.CACHE_VERIFICATION_CODE_EXPIRE_MINUTES, timeUnit = TimeUnit.MINUTES, cacheType = CacheType.REMOTE)
+    @Cached(name = Constants.CACHE_VERIFICATION_CODE, key = "#mobile", expire = Constants.CACHE_VERIFICATION_CODE_EXPIRE_MINUTES, timeUnit = TimeUnit.MINUTES)
     public VerificationCodeBO getVerificationCode(String mobile) {
         return null;
     }

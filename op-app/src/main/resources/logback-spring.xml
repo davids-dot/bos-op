@@ -42,7 +42,7 @@
     <logger name="org.apache.dubbo" level="ERROR"/>
     <logger name="org.apache.http" level="ERROR"/>
     <logger name="com.obs.services" level="ERROR"/>
-    <logger name="com.alibaba" level="ERROR"/>
+    <logger name="com.alibaba" level="INFO"/>
     <logger name="com.luoge" level="DEBUG"/>
 
     <root level="${level}">

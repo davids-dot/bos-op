@@ -3,6 +3,7 @@ package com.luoge.app.uc.wx;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.binarywang.wx.miniapp.util.WxMaConfigHolder;
+import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.luoge.app.uc.auth.AuthnService;
 import com.luoge.app.uc.auth.CacheService;
 import com.luoge.app.uc.core.ThirdUserType;
@@ -154,7 +155,7 @@ public class WxUserService {
 //    }
 //
 //
-    @Transactional
+    @DSTransactional
     public R<LoginResultBO> loginAndBindMiniAppByPhone(LoginByMobileAndCodeBO loginByPhoneBO, String appId) {
         if (!wxMaService.switchover(appId)) {
             throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appId));

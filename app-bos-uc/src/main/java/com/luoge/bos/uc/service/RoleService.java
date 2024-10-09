@@ -2,6 +2,7 @@ package com.luoge.bos.uc.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.luoge.bos.data.PermissionDao;
 import com.luoge.bos.data.RoleDao;
 import com.luoge.bos.data.entity.RoleDO;
@@ -16,7 +17,6 @@ import com.luoge.ns.core.R;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -48,7 +48,7 @@ public class RoleService {
         return roles;
     }
 
-    @Transactional
+    @DSTransactional
     public R<Void> insertRole(int orgId, RoleCreateBO role) {
         RoleDO existRoleDO = roleDao.getByName(orgId, role.getName());
         if (Objects.nonNull(existRoleDO)) {
@@ -80,14 +80,14 @@ public class RoleService {
         return R.SUCCESS;
     }
 
-    @Transactional
+    @DSTransactional
     public void deleteRole(int orgId, int roleId) {
         roleDao.delete(orgId, roleId);
         roleDao.deleteRoleUser(orgId, roleId);
         roleDao.deleteRolePermissions(orgId, roleId);
     }
 
-    @Transactional
+    @DSTransactional
     public void setRolePermissions(int orgId, int roleId, List<String> permissions) {
         roleDao.deleteRolePermissions(orgId, roleId);
         if (ObjectUtil.isNotEmpty(permissions)) {

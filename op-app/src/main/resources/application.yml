@@ -115,15 +115,18 @@ pagehelper:
   params: count=countSql;pageNum=pageNo;pageSize=pageSize
   supportMethodsArguments: true
 
+
 jetcache:
-  statIntervalMinutes: 300
+  statIntervalMinutes: 15
   areaInCacheName: false
   local:
     default:
-      type: caffeine
-      keyConvertor: fastjson2
-      limit: 100
-      expireAfterWriteInMillis: 100000
+      type: caffeine # 支持的类型：linkedhashmap、caffeine
+      limit: 200
+      keyConvertor: fastjson # 支持的类型：fastjson，可自定义转换器函数
+  remote:
+    default:
+      type: mock
 
 bos:
   file:

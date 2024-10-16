@@ -188,4 +188,36 @@
         AND org_id = #{orgId}
     </update>
 
+    <select id="listUserEnterprises" resultType="com.luoge.bos.data.model.EnterpriseBO">
+        SELECT
+        id,
+        org_id,
+        name,
+        short_name,
+        type,
+        tax_no,
+        region_code,
+        (select name from iam_dm_region where code = region_code) regionName,
+        industry_code,
+        (select name from iam_dm_industry where code = industry_code) industryName,
+        address,
+        bank bankName,
+        account bankAccount,
+        phone,
+        remark,
+        upstream_username,
+        upstream_passwd,
+        bureau_identity_type
+        FROM iam_enterprise
+        WHERE org_id = #{orgId}
+        AND status = 1
+        <if test="name != null and name != ''">
+            AND name like concat('%', #{name}, '%')
+        </if>
+        AND id in(select a.enterprise_id
+        from iam_enterprise_user a
+        where a.org_id = #{orgId} and a.user_id = #{userId})
+        ORDER BY create_time desc
+    </select>
+
 </mapper>

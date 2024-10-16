@@ -4,11 +4,12 @@ plugins {
 
 dependencies {
     api(project(":bos-common"))
+    implementation(project(":app-uc"))
 
     // Second-party packages
     implementation("com.luoge.ns:base-core:1.0-SNAPSHOT")
     implementation("com.luoge.bos:uc-api:1.0-SNAPSHOT")
-   // implementation("com.luoge.ns:uc-context:1.0-SNAPSHOT")
+    // implementation("com.luoge.ns:uc-context:1.0-SNAPSHOT")
     implementation("com.luoge.bos:uc-context:1.0-SNAPSHOT")
     // Third-party packages
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -21,6 +22,7 @@ dependencies {
     implementation("cn.hutool:hutool-core:5.8.22")
     implementation("cn.hutool:hutool-extra:5.8.22")
     implementation("com.sun.mail:javax.mail:1.6.2")
+
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")

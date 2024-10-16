@@ -1,17 +1,12 @@
 package com.luoge.app.uc.service;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.luoge.app.uc.model.EnterpriseBO;
-import com.luoge.app.uc.model.ListEnterpriseBO;
+import com.luoge.app.uc.model.EnterpriseSelectBO;
 import com.luoge.app.uc.model.SaveEnterpriseBO;
-import com.luoge.bos.core.utils.DateUtil;
 import com.luoge.bos.core.utils.StrUtil;
 import com.luoge.bos.data.EnterpriseDao;
 import com.luoge.bos.data.entity.EnterpriseDO;
-import com.luoge.bos.data.entity.UserDO;
-import com.luoge.ns.core.Page;
+import com.luoge.bos.data.model.EnterpriseBO;
 import com.luoge.ns.core.R;
 import com.luoge.ns.uc.core.AppID;
 import com.luoge.ns.uc.core.EnterpriseType;
@@ -19,18 +14,15 @@ import com.luoge.ns.uc.core.UCCode;
 import com.luoge.ns.uc.model.Enterprise;
 import jakarta.annotation.Resource;
 import jakarta.validation.Validator;
-import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class UcEnterpriseService {
@@ -47,7 +39,7 @@ public class UcEnterpriseService {
     @Resource
     private Validator validator;
 
-//    /**
+    //    /**
 //     * 企业管理-查询企业列表
 //     *
 //     * @param orgId 机构
@@ -78,19 +70,20 @@ public class UcEnterpriseService {
     /**
      * 查询当前用户可选择的企业列表
      * 查询合并发票、风控企业信息
+     *
      * @return 可选择的企业列表
      */
-//    public List<EnterpriseSelectBO> listUserEnterprises(int orgId, Integer userId, String name) {
-//        var enterprises = enterpriseDao.listUserEnterprises(orgId, userId, name);
-//        if (enterprises == null) {
-//            return Collections.emptyList();
-//        }
-//
-//        return enterprises.stream()
-//                .map(this::toEnterpriseSelectBO).toList();
-//    }
+    public List<EnterpriseSelectBO> listUserEnterprises(int orgId, Integer userId, String name) {
+        var enterprises = enterpriseDao.listUserEnterprises(orgId, userId, name);
+        if (enterprises == null) {
+            return Collections.emptyList();
+        }
 
-//    /**
+        return enterprises.stream()
+                .map(this::toEnterpriseSelectBO).toList();
+    }
+
+    //    /**
 //     * 新增企业
 //     *
 //     * @param orgId      机构id
@@ -182,7 +175,7 @@ public class UcEnterpriseService {
 //        enterpriseDao.setStatus(orgId, id, status);
 //    }
 
-//    @Transactional
+    //    @Transactional
 //    public void bindEnterpriseUsers(int orgId, Integer enterpriseId, List<Integer> userIds) {
 //        enterpriseDao.deleteEnterpriseUsers(orgId, enterpriseId);
 //        if (CollectionUtil.isNotEmpty(userIds)) {
@@ -199,20 +192,20 @@ public class UcEnterpriseService {
 //        return enterpriseDao.listEnterpriseUsers(orgId, enterpriseId, name);
 //    }
 //
-//    private EnterpriseSelectBO toEnterpriseSelectBO(EnterpriseBO enterpriseDO) {
-//        return new EnterpriseSelectBO()
-//                .setId(enterpriseDO.getId())
-//                .setName(enterpriseDO.getName())
-//                .setType(enterpriseDO.getType())
-//                .setAddress(enterpriseDO.getAddress())
-//                .setPhone(enterpriseDO.getPhone())
-//                .setBankName(enterpriseDO.getBankName())
-//                .setBankAccount(enterpriseDO.getBankAccount())
-//                .setRegionCode(enterpriseDO.getRegionCode())
-//                .setRegionName(enterpriseDO.getRegionName())
-//                .setTaxNo(enterpriseDO.getTaxNo())
-//                .setUpstreamUsername(enterpriseDO.getUpstreamUsername());
-//    }
+    private EnterpriseSelectBO toEnterpriseSelectBO(EnterpriseBO enterpriseDO) {
+        return new EnterpriseSelectBO()
+                .setId(enterpriseDO.getId())
+                .setName(enterpriseDO.getName())
+                .setType(enterpriseDO.getType())
+                .setAddress(enterpriseDO.getAddress())
+                .setPhone(enterpriseDO.getPhone())
+                .setBankName(enterpriseDO.getBankName())
+                .setBankAccount(enterpriseDO.getBankAccount())
+                .setRegionCode(enterpriseDO.getRegionCode())
+                .setRegionName(enterpriseDO.getRegionName())
+                .setTaxNo(enterpriseDO.getTaxNo())
+                .setUpstreamUsername(enterpriseDO.getUpstreamUsername());
+    }
 
     private EnterpriseBO toEnterpriseBO(EnterpriseDO enterpriseDO) {
         return new EnterpriseBO()
@@ -450,8 +443,6 @@ public class UcEnterpriseService {
 //        enterpriseDao.deleteEnterpriseUsers(orgId, enterpriseId);
 //        return R.success(enterpriseId);
 //    }
-
-
     private R<Void> checkSaveEnterprise(SaveEnterpriseBO enterprise) {
         // 校验
         AppID appID = AppID.of(enterprise.getAppId());

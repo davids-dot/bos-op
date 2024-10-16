@@ -5,6 +5,7 @@ import com.github.pagehelper.Page;
 import com.luoge.bos.core.BOSConsts;
 import com.luoge.bos.data.entity.EnterpriseDO;
 import com.luoge.bos.data.entity.IndustryDO;
+import com.luoge.bos.data.model.EnterpriseBO;
 import com.luoge.bos.data.model.EnterpriseCountBO;
 import com.luoge.bos.data.model.OrgEnterpriseBO;
 import org.apache.ibatis.annotations.Mapper;
@@ -58,4 +59,9 @@ public interface EnterpriseDao {
 
 
     void updateEnterprise(EnterpriseDO enterprise);
+
+
+    List<EnterpriseBO> listUserEnterprises(@Param("orgId") int orgId,
+                                           @Param("userId") int userId,
+                                           @Param("name") String name);
 }

@@ -9,7 +9,6 @@ import com.luoge.bos.data.UserDao;
 import com.luoge.bos.data.entity.UserDO;
 import com.luoge.ns.core.R;
 import com.luoge.ns.uc.core.UCCode;
-import com.luoge.app.uc.model.User;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,7 @@ public class UserService {
 
     @Resource
     private CacheService cacheService;
+
 
 //    @Resource
 //    private EnterpriseService enterpriseService;
@@ -127,6 +127,11 @@ public class UserService {
 
     public UserDO getByMobile(String phoneNumber) {
         return userDao.getByMobile(phoneNumber);
+    }
+
+
+    public User getFromCache(int userId) {
+        return cacheService.getUser(userId);
     }
 
 //    public String getEmail(String loginName) {

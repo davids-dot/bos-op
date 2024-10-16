@@ -1,6 +1,7 @@
 package com.luoge.bos.gateway.filter;
 
 import cn.hutool.core.text.AntPathMatcher;
+import com.luoge.app.uc.service.UserService;
 import com.luoge.bos.common.HttpUtil;
 import com.luoge.bos.common.JsonUtil;
 import com.luoge.bos.uc.core.HashIds;
@@ -9,10 +10,7 @@ import com.luoge.ns.core.Code;
 import com.luoge.ns.core.Constants;
 import com.luoge.ns.core.R;
 import jakarta.annotation.Resource;
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,7 +29,9 @@ public class AuthFilter implements Filter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Resource
-    private UCService ucService;
+    private UCService bosUcService;
+    @Resource
+    private UserService ucService;
 
     private Map<String, List<String>> resourceMappers;
 
@@ -73,20 +74,20 @@ public class AuthFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
-        // 如果是小程序端
-        boolean isMobile = Urls.isMobile(path);
-        if (isMobile) {
-            renderMobile(path);
-            return;
-        }
-
 
         if (Objects.isNull(userId)) {
             renderFail(Code.UNAUTHORIZED, "用户没有登录", response);
             return;
         }
 
-        var user = ucService.getUser(userId);
+        // 如果是小程序端
+        boolean isMobile = Urls.isMobile(req);
+        if (isMobile) {
+            renderMobile(orgId, userId, path, req, response, chain);
+            return;
+        }
+        // 如果是运营端
+        var user = bosUcService.getUser(userId);
         if (user == null) {
             renderFail(Code.UNAUTHORIZED, "用户没有登录", response);
             return;
@@ -100,7 +101,17 @@ public class AuthFilter implements Filter {
         chain.doFilter(wrappedRequest, response);
     }
 
-    private void renderMobile(String path) {
+    private void renderMobile(int orgId, int userId, String path,
+                              ServletRequest req, ServletResponse response,
+                              FilterChain chain) throws ServletException, IOException {
+        var user = ucService.getFromCache(userId);
+        if (user == null) {
+            renderFail(Code.UNAUTHORIZED, "用户没有登录", response);
+            return;
+        }
+
+        ServletRequest wrappedRequest = setAuthenticationInfo(orgId, userId, (HttpServletRequest) req);
+        chain.doFilter(wrappedRequest, response);
     }
 
     private HttpServletRequest setAuthenticationInfo(Integer orgId, Integer userId, HttpServletRequest req) {
@@ -150,7 +161,7 @@ public class AuthFilter implements Filter {
 
     private Map<String, List<String>> getResourceMappers() {
         if (Objects.isNull(resourceMappers)) {
-            resourceMappers = ucService.getResourceMappers();
+            resourceMappers = bosUcService.getResourceMappers();
         }
         return resourceMappers;
     }

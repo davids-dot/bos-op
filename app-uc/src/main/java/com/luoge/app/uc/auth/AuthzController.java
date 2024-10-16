@@ -1,12 +1,10 @@
 package com.luoge.app.uc.auth;
 
 import com.alibaba.fastjson2.JSON;
-import com.luoge.app.uc.model.EnterpriseBO;
-import com.luoge.app.uc.model.SaveEnterpriseBO;
-import com.luoge.app.uc.model.User;
-import com.luoge.app.uc.model.UserUpdateBO;
+import com.luoge.app.uc.model.*;
 import com.luoge.app.uc.service.UcEnterpriseService;
 import com.luoge.app.uc.service.UserService;
+import com.luoge.bos.data.model.EnterpriseBO;
 import com.luoge.bos.uc.ctx.Context;
 import com.luoge.ns.core.R;
 import com.luoge.ns.uc.core.UCCode;
@@ -15,6 +13,8 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * uc/用户认证授权
@@ -81,14 +81,15 @@ public class AuthzController {
 //        return userService.changePasswd(ctx.getOrgId(), ctx.getUserId(), reset.getOldPassword(), reset.getNewPassword());
 //    }
 
-//    /**
-//     * 获取用户可选择的企业列表
-//     */
-//    @GetMapping("/enterprises")
-//    public R<List<EnterpriseSelectBO>> listUserEnterprises(Context ctx, String name) {
-//        var r = enterpriseService.listUserEnterprises(ctx.getOrgId(), ctx.getUserId(), name);
-//        return R.success(r);
-//    }
+    /**
+     * 获取用户可选择的企业列表
+     */
+    @GetMapping("/enterprises")
+    public R<List<EnterpriseSelectBO>> listUserEnterprises(Context ctx, String name) {
+        var r = ucEnterpriseService.listUserEnterprises(ctx.getOrgId(), ctx.getUserId(), name);
+        return R.success(r);
+    }
+
 //
 //    /**
 //     * 获取企业列表(没有用户绑定关系也可查询出)

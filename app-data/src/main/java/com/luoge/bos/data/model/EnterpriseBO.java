@@ -1,4 +1,4 @@
-package com.luoge.app.uc.model;
+package com.luoge.bos.data.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

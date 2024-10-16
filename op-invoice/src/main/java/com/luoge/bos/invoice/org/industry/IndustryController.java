@@ -15,7 +15,7 @@ import java.util.List;
  */
 @RequestMapping("/bos-op/industry")
 @RestController
-public class AppIndustryController {
+public class IndustryController {
     @Resource
     private AppIndustryService appIndustryService;
 

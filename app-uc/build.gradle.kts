@@ -11,11 +11,12 @@ dependencies {
 
     implementation(project(":app-data"))
     implementation(project(":bos-common"))
+    implementation(project(":uc-context"))
 
     implementation("com.huawei.apigateway:java-sdk-core:3.2.4")
     // Second-party packages
     implementation("com.luoge.ns:uc-api:1.1.0-SNAPSHOT")
-   // implementation("com.luoge.ns:uc-context:1.0-SNAPSHOT")
+    // implementation("com.luoge.ns:uc-context:1.0-SNAPSHOT")
     implementation("com.luoge.bos:uc-context:1.0-SNAPSHOT")
     implementation("com.luoge.bos:uc-api:1.0-SNAPSHOT")
     implementation("com.luoge.ns:account-api:1.0.0-SNAPSHOT")

@@ -23,8 +23,8 @@ import java.util.Objects;
  */
 @RestController
 @RequestMapping("/invoice/common")
-public class CommonController {
-    private static final Logger log = LoggerFactory.getLogger(CommonController.class);
+public class InvoiceCommonController {
+    private static final Logger log = LoggerFactory.getLogger(InvoiceCommonController.class);
 
     //    @Resource
 //    private EnterpriseExtService enterpriseExtService;

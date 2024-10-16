@@ -2,6 +2,7 @@ package com.luoge.app.uc.configuration;
 
 
 import com.luoge.app.uc.wxctx.resolver.WxContextResolver;
+import com.luoge.ctx.AppContextResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -19,5 +20,6 @@ public class WxWebConverterConfiguration implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new WxContextResolver());
+        resolvers.add(new AppContextResolver());
     }
 }

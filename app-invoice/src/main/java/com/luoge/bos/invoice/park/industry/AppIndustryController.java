@@ -15,7 +15,7 @@ import java.util.List;
  */
 @RequestMapping("/mobile/invoice/park/industry")
 @RestController
-public class IndustryController {
+public class AppIndustryController {
     @Resource
     private IndustryService industryService;
 

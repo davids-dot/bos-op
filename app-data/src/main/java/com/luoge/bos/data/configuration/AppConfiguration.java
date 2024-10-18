@@ -1,6 +1,7 @@
 package com.luoge.bos.data.configuration;
 
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ public class AppConfiguration {
     @Resource
     private SmsConfig smsConfig;
 
+    @Value("${bos.file.storage-path}")
     private String fileStoragePath;
 
     @ConfigurationProperties(prefix = "sms")

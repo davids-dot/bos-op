@@ -44,6 +44,8 @@ public class Urls {
 
     public static boolean isMobile(HttpServletRequest req) {
         String miniAppId = req.getHeader(NS_APP_ID);
-        return StringUtils.isNotBlank(miniAppId);
+        String userAgent = req.getHeader("User-Agent");
+        return StringUtils.isNotBlank(miniAppId) || userAgent.toLowerCase().contains("micromessenger")
+                || userAgent.toLowerCase().contains("miniprogram");
     }
 }

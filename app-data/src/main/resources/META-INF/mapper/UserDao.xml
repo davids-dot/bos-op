@@ -22,14 +22,15 @@
     </insert>
 
     <update id="update">
-        update iam_user
-        set name        = #{name},
+        UPDATE iam_user
+        SET name        = #{name},
             mobile      = #{mobile},
             email       = #{email},
-            username    = #{username},
+            remark      = #{remark},
+            avatar      = #{avatar},
             update_time = #{updateTime}
-        where org_id = #{orgId}
-          and admin = 1
+        WHERE id = #{id}
+          AND org_id = #{orgId}
     </update>
 
     <update id="resetPassword">

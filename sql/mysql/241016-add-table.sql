@@ -6,6 +6,10 @@ CREATE TABLE `inv_industry` (
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='开票行业类型';
 
+
+ALTER TABLE ns_uc.iam_enterprise
+    ADD COLUMN short_name varchar(20) NULL COMMENT '企业简称' AFTER `name`;
+
 INSERT INTO `ns_invoice`.`inv_industry` (`id`, `name`, `example_enterprise`, `invoice_items`) VALUES (1, '建筑工程服务', '***建筑服务部', '建筑服务*安装服务,建筑服务*工程项目管理服务,建筑服务*工程服务,建筑服务*其他建筑服务,建筑服务*建筑工程服务,物流辅助服务*运输装卸服务,劳务*维修服务');
 INSERT INTO `ns_invoice`.`inv_industry` (`id`, `name`, `example_enterprise`, `invoice_items`) VALUES (2, '商务中介服务', '***商务服务部', '其他咨询服务*商务信息咨询,其他咨询服务*信息咨询,其他咨询服务*市场调研服务,经纪代理服务*商务代理,现代服务*推广服务费,现代服务*营销策划服务,经纪代理服务*中介服务,会展服务*会议服务,会展服务*展览服务');
 INSERT INTO `ns_invoice`.`inv_industry` (`id`, `name`, `example_enterprise`, `invoice_items`) VALUES (3, '营销推广', '***市场营销中心', '现代服务*营销策划,现代服务*市场推广,现代服务*策划服务,现代服务*推广服务费,现代服务*服务费');

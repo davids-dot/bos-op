@@ -20,7 +20,7 @@ import java.util.List;
  * uc/用户授权
  */
 @RestController
-@RequestMapping("bos-uc/auth")
+@RequestMapping("/bos-uc/auth")
 public class AuthorizationController {
     @Resource
     private AuthenticationService authenticationService;
